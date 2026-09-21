@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poke Linow</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+           <img src="logo.png" alt="Poke Linow">
+        </div>
+
+        <div class="section-title">
+            BUSCAR
+        </div>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Buscar Pokémon..."
+            >
+        </div>
+
+        <div class="filter-item">Tipo</div>
+        <div class="filter-item">Região</div>
+        <div class="filter-item">Geração</div>
+        <div class="filter-item">Evolução</div>
+
+        <button id="clearFiltersBtn">
+            Limpar filtros
+        </button>
+
+        <button id="favoritesBtn">
+            ❤️ Favoritos
+        </button>
+
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="content">
+
+        <nav class="navbar">
+            <button class="nav-btn active">
+                Pokémon
+            </button>
+
+            <button class="nav-btn">
+                Ataques
+            </button>
+
+            <button class="nav-btn">
+                Itens
+            </button>
+        </nav>
+
+        <div class="topbar">
+
+            <h1>
+                Todos os Pokémon
+            </h1>
+
+            <span id="pokemonCount"></span>
+
+        </div>
+
+        <div
+            id="pokemonGrid"
+            class="pokemon-grid"
+        ></div>
+
+    </main>
+
+    <!-- DETALHES -->
+    <aside
+        id="detailPanel"
+        class="detail-panel"
+    ></aside>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
