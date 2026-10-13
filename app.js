@@ -1,557 +1,163 @@
-// ======================================
-// DADOS
-// ======================================
+// ===== Elementos =====
+const listaPokemon = document.getElementById('pokedex-lista');
+const contadorEl = document.getElementById('contador');
+const campoBusca = document.getElementById('searchInput');
+const filtroTipo = document.getElementById('filtroTipo');
+const filtroGeracao = document.getElementById('filtroGeracao');
+const filtroRegiao = document.getElementById('filtroRegiao');
+const botaoLimpar = document.getElementById('limparFiltros');
 
-const POKEMON_DATA = [
-{
-id:25,
-name:"pikachu",
-height:4,
-weight:60,
-sprites:{
-front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
-},
-types:[
-{
-type:{name:"electric"}
-}
-],
-abilities:[
-{
-ability:{name:"static"}
-},
-{
-ability:{name:"lightning-rod"}
-}
-],
-stats:[
-{
-stat:{name:"hp"},
-base_stat:35
-},
-{
-stat:{name:"attack"},
-base_stat:55
-},
-{
-stat:{name:"defense"},
-base_stat:40
-},
-{
-stat:{name:"speed"},
-base_stat:90
-}
-]
-},
+const quantidadePokemons = 1025;
 
-{
-id:1,
-name:"bulbasaur",
-height:7,
-weight:69,
-sprites:{
-front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
-},
-types:[
-{
-type:{name:"grass"}
-},
-{
-type:{name:"poison"}
-}
-],
-abilities:[
-{
-ability:{name:"overgrow"}
-}
-],
-stats:[
-{
-stat:{name:"hp"},
-base_stat:45
-},
-{
-stat:{name:"attack"},
-base_stat:49
-},
-{
-stat:{name:"defense"},
-base_stat:49
-},
-{
-stat:{name:"speed"},
-base_stat:45
-}
-]
-},
+// ===== Dados fixos =====
 
-{
-id:4,
-name:"charmander",
-height:6,
-weight:85,
-sprites:{
-front_default:"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
-},
-types:[
-{
-type:{name:"fire"}
-}
-],
-abilities:[
-{
-ability:{name:"blaze"}
-}
-],
-stats:[
-{
-stat:{name:"hp"},
-base_stat:39
-},
-{
-stat:{name:"attack"},
-base_stat:52
-},
-{
-stat:{name:"defense"},
-base_stat:43
-},
-{
-stat:{name:"speed"},
-base_stat:65
-}
-]
-}
-];
+// Cores das etiquetas de tipo e da borda do card
+const coresEtiquetas = {
+  grass: '#78c850', fire: '#f08030', water: '#6890f0', bug: '#a8b820',
+  normal: '#a8a878', poison: '#a040a0', electric: '#f8d030', ground: '#e0c068',
+  fairy: '#ee99ac', fighting: '#c03028', psychic: '#f85888', rock: '#b8a038',
+  ghost: '#705898', ice: '#98d8d8', dragon: '#7038f8'
+};
 
-// ======================================
-// ELEMENTOS
-// ======================================
+// Faixa de IDs de cada geração
+const geracoes = {
+  1: [1, 151],
+  2: [152, 251],
+  3: [252, 386],
+  4: [387, 493],
+  5: [494, 649],
+  6: [650, 721],
+  7: [722, 809],
+  8: [810, 905],
+  9: [906, 1025]
+};
 
-const pokemonGrid =
-document.getElementById("pokemonGrid");
+// Faixa de IDs de cada região
+const regioes = {
+  kanto: [1, 151],
+  johto: [152, 251],
+  hoenn: [252, 386],
+  sinnoh: [387, 493],
+  unova: [494, 649],
+  kalos: [650, 721],
+  alola: [722, 809],
+  galar: [810, 905],
+  paldea: [906, 1025]
+};
 
-const pokemonCount =
-document.getElementById("pokemonCount");
-
-const detailPanel =
-document.getElementById("detailPanel");
-
-const searchInput =
-document.getElementById("searchInput");
-
-const clearFiltersBtn =
-document.getElementById("clearFiltersBtn");
-
-const favoritesBtn =
-document.getElementById("favoritesBtn");
-
-// ======================================
-// FAVORITOS
-// ======================================
-
-function getFavorites(){
-
-return JSON.parse(
-localStorage.getItem("favoritos")
-) || [];
-
+// ===== Busca na API =====
+async function buscarPokemons() {
+  for (let i = 1; i <= quantidadePokemons; i++) {
+    try {
+      const resposta = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+      const pokemon = await resposta.json();
+      criarCardPokemon(pokemon);
+    } catch (erro) {
+      console.error(`Erro ao buscar o Pokémon de ID ${i}:`, erro);
+    }
+  }
 }
 
-function saveFavorites(lista){
+// ===== Criação do card =====
+function criarCardPokemon(pokemon) {
+  const card = document.createElement('div');
+  card.classList.add('cartao-pokemon');
 
-localStorage.setItem(
-"favoritos",
-JSON.stringify(lista)
-);
+  // Tipo principal define a cor da borda
+  const tipoPrincipal = pokemon.types[0].type.name;
+  card.style.borderColor = coresEtiquetas[tipoPrincipal] || '#a8a878';
 
+  // Guarda id e tipos no card para os filtros usarem
+  card.dataset.id = pokemon.id;
+  card.dataset.tipos = pokemon.types.map(t => t.type.name).join(' ');
+
+  // Formata o número (1 vira #001)
+  const idFormatado = String(pokemon.id).padStart(3, '0');
+
+  // Etiquetas de tipo
+  const etiquetasTiposHTML = pokemon.types.map(infoTipo => {
+    const nomeTipo = infoTipo.type.name;
+    const corEtiqueta = coresEtiquetas[nomeTipo] || '#a8a878';
+    return `<span class="tipo" style="background-color: ${corEtiqueta}">${nomeTipo}</span>`;
+  }).join('');
+
+  const imagemUrl = pokemon.sprites.front_default;
+
+  card.innerHTML = `
+    <div class="numero">#${idFormatado}</div>
+    <img src="${imagemUrl}" alt="${pokemon.name}" class="imagem-pokemon">
+    <h2 class="nome-pokemon">${pokemon.name}</h2>
+    <div class="tipos">
+      ${etiquetasTiposHTML}
+    </div>
+  `;
+
+  // Respeita os filtros ativos enquanto os cards ainda chegam
+  card.hidden = !combinaComBusca(card);
+
+  listaPokemon.appendChild(card);
+  atualizarContador();
 }
 
-// ======================================
-// RENDER
-// ======================================
-
-function renderPokemon(lista){
-
-pokemonGrid.innerHTML = "";
-
-pokemonCount.textContent =
-`${lista.length} Pokémon encontrados`;
-
-const favoritos =
-getFavorites();
-
-lista.forEach(pokemon=>{
-
-const card =
-document.createElement("div");
-
-card.classList.add("card");
-
-const tipoPrincipal =
-pokemon.types[0]?.type?.name;
-
-if(tipoPrincipal){
-
-card.classList.add(tipoPrincipal);
-
+// ===== Contador =====
+function atualizarContador() {
+  const exibidos = listaPokemon.querySelectorAll('.cartao-pokemon:not([hidden])').length;
+  contadorEl.textContent = `Exibindo ${exibidos} de ${quantidadePokemons}`;
 }
 
-const favorito =
-favoritos.includes(
-pokemon.id
-);
+// ===== Filtros =====
 
-card.innerHTML = `
-
-<div class="card-number">
-#${pokemon.id
-.toString()
-.padStart(3,"0")}
-</div>
-
-<img
-src="${pokemon.sprites.front_default}"
-alt="${pokemon.name}"
->
-
-<div class="card-name">
-${pokemon.name}
-</div>
-
-<div>
-${pokemon.types
-.map(t=>t.type.name)
-.join(", ")}
-</div>
-
-<div class="favorite ${
-favorito ? "active" : ""
-}">
-❤
-</div>
-
-`;
-
-card.addEventListener(
-"click",
-()=>{
-
-document
-.querySelectorAll(".card")
-.forEach(c=>
-c.classList.remove("active")
-);
-
-card.classList.add(
-"active"
-);
-
-mostrarDetalhes(
-pokemon
-);
-
-}
-);
-
-const favBtn =
-card.querySelector(
-".favorite"
-);
-
-favBtn.addEventListener(
-"click",
-(e)=>{
-
-e.stopPropagation();
-
-let favoritos =
-getFavorites();
-
-if(
-favoritos.includes(
-pokemon.id
-)
-){
-
-favoritos =
-favoritos.filter(
-id=>id !== pokemon.id
-);
-
-favBtn.classList.remove(
-"active"
-);
-
-}else{
-
-favoritos.push(
-pokemon.id
-);
-
-favBtn.classList.add(
-"active"
-);
-
+// Verifica se o id está dentro de uma faixa (sem faixa = sem filtro)
+function dentroDaFaixa(id, faixa) {
+  if (!faixa) return true;
+  return id >= faixa[0] && id <= faixa[1];
 }
 
-saveFavorites(
-favoritos
-);
+// Retorna true se o card passa em todos os filtros
+function combinaComBusca(card) {
+  const termo = campoBusca.value.trim().toLowerCase();
+  const nome = card.querySelector('.nome-pokemon').textContent.toLowerCase();
+  const numero = card.querySelector('.numero').textContent;
+  const combinaTexto = nome.includes(termo) || numero.includes(termo);
 
-}
-);
+  const tipo = filtroTipo.value;
+  const combinaTipo = !tipo || card.dataset.tipos.split(' ').includes(tipo);
 
-pokemonGrid.appendChild(
-card
-);
+  const id = Number(card.dataset.id);
+  const combinaGeracao = dentroDaFaixa(id, geracoes[filtroGeracao.value]);
+  const combinaRegiao = dentroDaFaixa(id, regioes[filtroRegiao.value]);
 
-});
-
-}
-
-// ======================================
-// DETALHES
-// ======================================
-
-function mostrarDetalhes(
-pokemon
-){
-
-const notaSalva =
-localStorage.getItem(
-`note-${pokemon.id}`
-) || "";
-
-detailPanel.innerHTML = `
-
-<img
-class="detail-image"
-src="${pokemon.sprites.front_default}"
-alt="${pokemon.name}"
->
-
-<div class="detail-name">
-${pokemon.name}
-</div>
-
-<div class="detail-id">
-#${pokemon.id}
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Altura
-</div>
-
-<strong>
-${pokemon.height}
-</strong>
-
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Peso
-</div>
-
-<strong>
-${pokemon.weight}
-</strong>
-
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Tipos
-</div>
-
-<div class="badges">
-
-${pokemon.types.map(tipo=>`
-
-<span
-class="badge ${tipo.type.name}"
->
-
-${tipo.type.name}
-
-</span>
-
-`).join("")}
-
-</div>
-
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Habilidades
-</div>
-
-${pokemon.abilities
-.map(
-a=>a.ability.name
-)
-.join(", ")}
-
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Status Base
-</div>
-
-${pokemon.stats.map(stat=>`
-
-<div class="move">
-
-<strong>
-${stat.stat.name}
-</strong>
-
-: ${stat.base_stat}
-
-</div>
-
-`).join("")}
-
-</div>
-
-<div class="info-row">
-
-<div class="info-title">
-Anotações
-</div>
-
-<textarea
-id="pokemonNote"
-placeholder="Escreva observações..."
->${notaSalva}</textarea>
-
-<button id="saveNote">
-Salvar
-</button>
-
-</div>
-
-`;
-
-const saveBtn =
-document.getElementById(
-"saveNote"
-);
-
-saveBtn.addEventListener(
-"click",
-()=>{
-
-const texto =
-document.getElementById(
-"pokemonNote"
-).value;
-
-localStorage.setItem(
-`note-${pokemon.id}`,
-texto
-);
-
-saveBtn.textContent =
-"Salvo ✓";
-
-setTimeout(()=>{
-
-saveBtn.textContent =
-"Salvar";
-
-},1000);
-
-}
-);
-
+  return combinaTexto && combinaTipo && combinaGeracao && combinaRegiao;
 }
 
-// ======================================
-// BUSCA
-// ======================================
+// Mostra ou esconde os cards conforme os filtros
+function filtrarPokemons() {
+  const cards = listaPokemon.querySelectorAll('.cartao-pokemon');
 
-searchInput.addEventListener(
-"input",
-()=>{
+  cards.forEach((card) => {
+    card.hidden = !combinaComBusca(card);
+  });
 
-const termo =
-searchInput.value
-.toLowerCase();
-
-const filtrados =
-POKEMON_DATA.filter(
-pokemon=>
-pokemon.name
-.toLowerCase()
-.includes(termo)
-);
-
-renderPokemon(
-filtrados
-);
-
+  atualizarContador();
 }
-);
 
-// ======================================
-// LIMPAR
-// ======================================
+// Volta todos os filtros ao estado inicial
+function limparFiltros() {
+  campoBusca.value = '';
+  filtroTipo.value = '';
+  filtroGeracao.value = '';
+  filtroRegiao.value = '';
 
-clearFiltersBtn.addEventListener(
-"click",
-()=>{
-
-searchInput.value = "";
-
-renderPokemon(
-POKEMON_DATA
-);
-
+  filtrarPokemons();
 }
-);
 
-// ======================================
-// FAVORITOS
-// ======================================
+// ===== Eventos =====
+campoBusca.addEventListener('input', filtrarPokemons);
+filtroTipo.addEventListener('change', filtrarPokemons);
+filtroGeracao.addEventListener('change', filtrarPokemons);
+filtroRegiao.addEventListener('change', filtrarPokemons);
+botaoLimpar.addEventListener('click', limparFiltros);
 
-favoritesBtn.addEventListener(
-"click",
-()=>{
-
-const favoritos =
-getFavorites();
-
-const lista =
-POKEMON_DATA.filter(
-pokemon=>
-favoritos.includes(
-pokemon.id
-)
-);
-
-renderPokemon(lista);
-
-}
-);
-
-// ======================================
-// INICIAR
-// ======================================
-
-renderPokemon(
-POKEMON_DATA
-);
-
-mostrarDetalhes(
-POKEMON_DATA[0]
-);
+// ===== Início =====
+atualizarContador();
+buscarPokemons();
