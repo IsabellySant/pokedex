@@ -1,13 +1,10 @@
 /* ===== Variáveis ===== */
 :root {
   --largura-barra: 200px;
-<<<<<<< HEAD
   --altura-cabecalho: 80px;
   --vermelho: #f8cd4d;
-=======
   --altura-cabecalho: 60px;
   --vermelho: #e3350d;
->>>>>>> d30b33a982bf11d9268ee3dc20898684e5e64de0
   --amarelo: #f6eeaa;
   --texto: #313131;
 }
@@ -359,7 +356,6 @@ body {
   display: block;
   height: 100%;
   background-color: var(--vermelho);
-<<<<<<< HEAD
 }
 
 /* Celular: a barra de detalhes vira um painel por cima da tela */
@@ -379,6 +375,4 @@ body {
   .detalhes, .cartao-pokemon {
     transition: none;
   }
-=======
->>>>>>> d30b33a982bf11d9268ee3dc20898684e5e64de0
 }
