@@ -1,7 +1,7 @@
 /* ===== Variáveis ===== */
 :root {
   --largura-barra: 200px;
-  --altura-cabecalho: 80px;
+  --altura-cabecalho: 60px;
   --vermelho: #e3350d;
   --amarelo: #f6eeaa;
   --texto: #313131;
@@ -244,19 +244,19 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: #d4c8ee;
   border-left: 0 solid var(--vermelho);
   transition: width 0.35s ease;
 }
 
 .detalhes.aberta {
-  width: 320px;
+  width: 400px;
   border-left-width: 4px;
 }
 
 /* Largura fixa por dentro: o texto não fica espremido durante a animação */
 .detalhes-interna {
-  width: 320px;
+  width: 400px;
   height: 100%;
   padding: 20px;
   overflow-y: auto;
@@ -282,9 +282,14 @@ body {
 
 #detImagem {
   display: block;
+  text-align: center;
   width: 190px;
   height: 190px;
-  margin: 30px auto 0;
+  margin: 30px auto 0; /* Mantém a centralização base */
+  transform: translateX(10px);
+  background-color: #ffffff;
+  border: 8px solid #a0a0a0;
+  border-radius: 3px;
 }
 
 #detNumero {
@@ -341,24 +346,4 @@ body {
   display: block;
   height: 100%;
   background-color: var(--vermelho);
-}
-
-/* Celular: a barra de detalhes vira um painel por cima da tela */
-@media (max-width: 800px) {
-  .detalhes {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 200;
-  }
-  .detalhes.aberta {
-    width: min(320px, 100vw);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .detalhes,
-  .cartao-pokemon {
-    transition: none;
-  }
 }
