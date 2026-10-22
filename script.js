@@ -6,8 +6,12 @@ const filtroTipo = document.getElementById('filtroTipo');
 const filtroGeracao = document.getElementById('filtroGeracao');
 const filtroRegiao = document.getElementById('filtroRegiao');
 const botaoLimpar = document.getElementById('limparFiltros');
+const detalhes = document.getElementById('detalhes');
 
 const quantidadePokemons = 1025;
+
+// Guarda os dados de cada Pokémon para a barra de detalhes usar
+const dadosPokemons = {};
 
 // ===== Dados fixos =====
 
@@ -19,42 +23,118 @@ const coresEtiquetas = {
   ghost: '#705898', ice: '#98d8d8', dragon: '#7038f8'
 };
 
-// Faixa de IDs de cada geração
-const geracoes = {
-  1: [1, 151],
-  2: [152, 251],
-  3: [252, 386],
-  4: [387, 493],
-  5: [494, 649],
-  6: [650, 721],
-  7: [722, 809],
-  8: [810, 905],
-  9: [906, 1025]
+// Nomes dos status em português
+const nomesStatus = {
+  'hp': 'HP',
+  'attack': 'Ataque',
+  'defense': 'Defesa',
+  'special-attack': 'Ataque Esp.',
+  'special-defense': 'Defesa Esp.',
+  'speed': 'Velocidade'
 };
 
-// Faixa de IDs de cada região
-const regioes = {
-  kanto: [1, 151],
-  johto: [152, 251],
-  hoenn: [252, 386],
-  sinnoh: [387, 493],
-  unova: [494, 649],
-  kalos: [650, 721],
-  alola: [722, 809],
-  galar: [810, 905],
-  paldea: [906, 1025]
+// Conjuntos de IDs (preenchidos pela API)
+const geracoes = {};   // ex: geracoes[1] = Set de ids da geração 1
+const regioes = {};    // ex: regioes.johto = Set de ids que aparecem em Johto
+
+// Pokédex da PokeAPI que formam cada região
+const pokedexRegioes = {
+  kanto:  ['kanto'],
+  johto:  ['original-johto'],
+  hoenn:  ['hoenn'],
+  sinnoh: ['original-sinnoh'],
+  unova:  ['original-unova'],
+  kalos:  ['kalos-central', 'kalos-coastal', 'kalos-mountain'],
+  alola:  ['updated-alola'],
+  galar:  ['galar'],
+  paldea: ['paldea']
 };
 
-// ===== Busca na API =====
-async function buscarPokemons() {
+// ===== Busca na API com Promise.all() =====
+function buscarPokemons() {
+  const promessas = [];
+
+  // 1. Cria um array com todas as requisições (sem esperar por elas ainda)
   for (let i = 1; i <= quantidadePokemons; i++) {
+    const promessa = fetch(`https://pokeapi.co/api/v2/pokemon/${i}`)
+      .then(resposta => resposta.json());
+      
+    promessas.push(promessa);
+  }
+
+  // 2. Executa todas as Promises simultaneamente
+  Promise.all(promessas)
+    .then(listaDePokemons => {
+      // Quando TODAS terminarem, cria os cards na ordem correta
+      listaDePokemons.forEach(pokemon => {
+        criarCardPokemon(pokemon);
+      });
+    })
+    .catch(erro => {
+      // Se UMA requisição falhar, ele cai aqui
+      console.error("Erro ao buscar os Pokémons:", erro);
+    });
+}
+
+// Extrai o id do final da URL (".../pokemon-species/25/" vira 25)
+function idDaUrl(url) {
+  return Number(url.split('/').filter(Boolean).pop());
+}
+
+// Carrega quais Pokémon pertencem a cada geração
+// Carrega quais Pokémon pertencem a cada geração (todas ao mesmo tempo)
+async function carregarGeracoes() {
+  const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  await Promise.all(numeros.map(async (g) => {
     try {
-      const resposta = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-      const pokemon = await resposta.json();
-      criarCardPokemon(pokemon);
+      const resposta = await fetch(`https://pokeapi.co/api/v2/generation/${g}`);
+      const dados = await resposta.json();
+      geracoes[g] = new Set(dados.pokemon_species.map(e => idDaUrl(e.url)));
     } catch (erro) {
-      console.error(`Erro ao buscar o Pokémon de ID ${i}:`, erro);
+      console.error(`Erro ao carregar a geração ${g}:`, erro);
     }
+  }));
+}
+
+// Carrega quais Pokémon aparecem em cada região (todas ao mesmo tempo)
+async function carregarRegioes() {
+  const nomesRegioes = Object.keys(pokedexRegioes);
+
+  await Promise.all(nomesRegioes.map(async (regiao) => {
+    const ids = new Set();
+
+    // Uma região pode ter vários pokédex (ex: Kalos), então busca todos juntos
+    await Promise.all(pokedexRegioes[regiao].map(async (nomePokedex) => {
+      try {
+        const resposta = await fetch(`https://pokeapi.co/api/v2/pokedex/${nomePokedex}`);
+        const dados = await resposta.json();
+        dados.pokemon_entries.forEach(e => ids.add(idDaUrl(e.pokemon_species.url)));
+      } catch (erro) {
+        console.error(`Erro ao carregar o pokédex ${nomePokedex}:`, erro);
+      }
+    }));
+
+    regioes[regiao] = ids;
+  }));
+}
+
+// Carrega quais Pokémon aparecem em cada região
+async function carregarRegioes() {
+  for (const regiao in pokedexRegioes) {
+    const ids = new Set();
+
+    for (const nomePokedex of pokedexRegioes[regiao]) {
+      try {
+        const resposta = await fetch(`https://pokeapi.co/api/v2/pokedex/${nomePokedex}`);
+        const dados = await resposta.json();
+        dados.pokemon_entries.forEach(e => ids.add(idDaUrl(e.pokemon_species.url)));
+      } catch (erro) {
+        console.error(`Erro ao carregar o pokédex ${nomePokedex}:`, erro);
+      }
+    }
+
+    regioes[regiao] = ids;
   }
 }
 
@@ -70,6 +150,12 @@ function criarCardPokemon(pokemon) {
   // Guarda id e tipos no card para os filtros usarem
   card.dataset.id = pokemon.id;
   card.dataset.tipos = pokemon.types.map(t => t.type.name).join(' ');
+
+  // Guarda os dados completos para a barra de detalhes
+  dadosPokemons[pokemon.id] = pokemon;
+
+  // Permite focar e abrir o card com o teclado
+  card.tabIndex = 0;
 
   // Formata o número (1 vira #001)
   const idFormatado = String(pokemon.id).padStart(3, '0');
@@ -107,10 +193,12 @@ function atualizarContador() {
 
 // ===== Filtros =====
 
-// Verifica se o id está dentro de uma faixa (sem faixa = sem filtro)
-function dentroDaFaixa(id, faixa) {
-  if (!faixa) return true;
-  return id >= faixa[0] && id <= faixa[1];
+// Verifica se o id está no conjunto escolhido (sem filtro = passa)
+function pertence(id, conjuntos, valor) {
+  if (!valor) return true;                // nenhum filtro selecionado
+  const conjunto = conjuntos[valor];
+  if (!conjunto) return true;             // lista ainda carregando
+  return conjunto.has(id);
 }
 
 // Retorna true se o card passa em todos os filtros
@@ -124,8 +212,8 @@ function combinaComBusca(card) {
   const combinaTipo = !tipo || card.dataset.tipos.split(' ').includes(tipo);
 
   const id = Number(card.dataset.id);
-  const combinaGeracao = dentroDaFaixa(id, geracoes[filtroGeracao.value]);
-  const combinaRegiao = dentroDaFaixa(id, regioes[filtroRegiao.value]);
+  const combinaGeracao = pertence(id, geracoes, filtroGeracao.value);
+  const combinaRegiao = pertence(id, regioes, filtroRegiao.value);
 
   return combinaTexto && combinaTipo && combinaGeracao && combinaRegiao;
 }
@@ -151,6 +239,50 @@ function limparFiltros() {
   filtrarPokemons();
 }
 
+// ===== Barra de detalhes =====
+function abrirDetalhes(id, card) {
+  const pokemon = dadosPokemons[id];
+  if (!pokemon) return;
+
+  // Destaca o card selecionado
+  listaPokemon.querySelectorAll('.ativo').forEach(c => c.classList.remove('ativo'));
+  card.classList.add('ativo');
+
+  const imagem = pokemon.sprites.front_default;
+
+  document.getElementById('detImagem').src = imagem;
+  document.getElementById('detImagem').alt = pokemon.name;
+  document.getElementById('detNumero').textContent = '#' + String(pokemon.id).padStart(3, '0');
+  document.getElementById('detNome').textContent = pokemon.name;
+  document.getElementById('detAltura').textContent = (pokemon.height / 10) + ' m';
+  document.getElementById('detPeso').textContent = (pokemon.weight / 10) + ' kg';
+
+  document.getElementById('detTipos').innerHTML = pokemon.types.map(t => {
+    const nome = t.type.name;
+    const cor = coresEtiquetas[nome] || '#a8a878';
+    return `<span class="tipo" style="background-color: ${cor}">${nome}</span>`;
+  }).join('');
+
+  document.getElementById('detStats').innerHTML = pokemon.stats.map(s => {
+    const nome = nomesStatus[s.stat.name] || s.stat.name;
+    const largura = Math.min(s.base_stat / 150 * 100, 100);
+    return `
+      <div class="stat">
+        <div class="stat-topo"><span>${nome}</span><b>${s.base_stat}</b></div>
+        <div class="stat-barra"><span style="width: ${largura}%"></span></div>
+      </div>`;
+  }).join('');
+
+  detalhes.classList.add('aberta');            // expande a barra
+  detalhes.setAttribute('aria-hidden', 'false');
+}
+
+function fecharDetalhes() {
+  detalhes.classList.remove('aberta');         // recolhe a barra
+  detalhes.setAttribute('aria-hidden', 'true');
+  listaPokemon.querySelectorAll('.ativo').forEach(c => c.classList.remove('ativo'));
+}
+
 // ===== Eventos =====
 campoBusca.addEventListener('input', filtrarPokemons);
 filtroTipo.addEventListener('change', filtrarPokemons);
@@ -158,6 +290,30 @@ filtroGeracao.addEventListener('change', filtrarPokemons);
 filtroRegiao.addEventListener('change', filtrarPokemons);
 botaoLimpar.addEventListener('click', limparFiltros);
 
+// Clique (ou Enter) em qualquer card abre a barra de detalhes
+listaPokemon.addEventListener('click', (e) => {
+  const card = e.target.closest('.cartao-pokemon');
+  if (card) abrirDetalhes(card.dataset.id, card);
+});
+
+listaPokemon.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const card = e.target.closest('.cartao-pokemon');
+  if (card) abrirDetalhes(card.dataset.id, card);
+});
+
+document.getElementById('detalhesFechar').addEventListener('click', fecharDetalhes);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') fecharDetalhes();
+});
+
 // ===== Início =====
-atualizarContador();
-buscarPokemons();
+async function iniciar() {
+  atualizarContador();
+  buscarPokemons();              // os cards continuam chegando normalmente
+
+  await Promise.all([carregarGeracoes(), carregarRegioes()]);
+  filtrarPokemons();             // reaplica os filtros quando as listas chegarem
+}
+
+iniciar();
