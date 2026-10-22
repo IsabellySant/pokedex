@@ -13,10 +13,6 @@
   // Guarda os dados de cada Pokémon para a barra de detalhes usar
   const dadosPokemons = {};
 
-<<<<<<< HEAD
-=======
-  // ===== Dados fixos =====
->>>>>>> d30b33a982bf11d9268ee3dc20898684e5e64de0
 
   // Cores das etiquetas de tipo e da borda do card
   const coresEtiquetas = {
