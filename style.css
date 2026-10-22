@@ -2,7 +2,7 @@
 :root {
   --largura-barra: 200px;
   --altura-cabecalho: 80px;
-  --vermelho: #e3350d;
+  --vermelho: #f8cd4d;
   --amarelo: #f6eeaa;
   --texto: #313131;
 }
@@ -31,7 +31,7 @@ body {
   justify-content: center;
   height: var(--altura-cabecalho);
   padding-left: var(--largura-barra); /* centraliza na área ao lado da barra */
-  background-color: #000000;
+  background-color: #ffb731;
 }
 
 .cabecalho nav ul {
@@ -54,8 +54,7 @@ body {
   cursor: pointer;
 }
 
-.cabecalho nav button:hover,
-.cabecalho nav button:focus-visible {
+.cabecalho nav button:hover, .cabecalho nav button:focus-visible {
   border-bottom-color: #cccccc;
 }
 
@@ -63,6 +62,16 @@ body {
   color: #ffffff;
   font-weight: bold;
   border-bottom-color: #ffffff;
+}
+
+.cabecalho nav .quiz {
+  padding: 6px;
+}
+
+.quiz img {
+  display: block;
+  height: 32px;   /* o cabeçalho tem 80px, então mantenha abaixo de ~50px */
+  width: auto;    /* mantém a proporção da imagem */
 }
 
 /* ===== Layout ===== */
@@ -274,8 +283,7 @@ body {
   cursor: pointer;
 }
 
-.detalhes-fechar:hover,
-.detalhes-fechar:focus-visible {
+.detalhes-fechar:hover, .detalhes-fechar:focus-visible {
   background-color: var(--vermelho);
   color: #ffffff;
 }
@@ -357,8 +365,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .detalhes,
-  .cartao-pokemon {
+  .detalhes, .cartao-pokemon {
     transition: none;
   }
 }
