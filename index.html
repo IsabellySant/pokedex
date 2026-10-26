@@ -15,8 +15,8 @@
     <nav>
       <ul>
         <li><button class="ativo" id="abaPokemon">Pokémon</button></li>
-        <li><button>Ataques</button></li>
-        <li><button>Itens</button></li>
+        <li><button id="abaAtaques">Ataques</button></li>
+        <li><button id="abaItens">Itens</button></li>
         <li><button id="abaFavoritos">Favoritos</button></li>
         <li><button class="quiz" aria-label="quizpokemon"> <img src="imagens/mimikyuquizz.png" alt="" width="32"
               height="32"></button></li>
@@ -103,6 +103,10 @@
       <div class="pokemons" id="pokedex-lista">
         <!-- aqui vão os cards -->
       </div>
+      
+      <!-- Novas listas de itens e ataques ocultas por padrão -->
+      <div class="pokemons" id="lista-ataques" hidden></div>
+      <div class="pokemons" id="lista-itens" hidden></div>
     </main>
 
     <aside class="detalhes" id="detalhes" aria-hidden="true">
@@ -114,13 +118,56 @@
         <h2 id="detNome"></h2>
         <div id="detTipos" class="tipos"></div>
 
-        <div class="det-medidas">
-          <span>Altura<b id="detAltura"></b></span>
-          <span>Peso<b id="detPeso"></b></span>
+        <!-- Caixa de Informações (Azul) -->
+        <div class="det-caixa-info">
+          <div class="info-item">
+            <span>Altura</span>
+            <b id="detAltura"></b>
+          </div>
+          <div class="info-item">
+            <span>Categoria</span>
+            <b id="detCategoria">...</b>
+          </div>
+          <div class="info-item">
+            <span>Peso</span>
+            <b id="detPeso"></b>
+          </div>
+          <div class="info-item">
+            <span>Habilidades</span>
+            <b id="detHabilidades"></b>
+          </div>
+          <div class="info-item">
+            <span>Sexo</span>
+            <b id="detSexo">...</b>
+          </div>
         </div>
 
-        <h3>Status</h3>
+        <div class="det-sessao">
+          <h3>Fraquezas</h3>
+          <div id="detFraquezas" class="tipos">...</div>
+        </div>
+
+        <!-- Imagem Shiny -->
+        <div class="det-sessao det-shiny">
+          <h3>Versão Shiny</h3>
+          <img id="detShiny" src="" alt="Shiny" hidden>
+        </div>
+
+        <h3>Status Base</h3>
         <div id="detStats"></div>
+
+        <!-- Caixa de Evoluções (Cinza) -->
+        <div class="det-sessao caixa-evolucoes">
+          <h3>Evoluções</h3>
+          <div id="detEvolucoes" class="evolucoes-lista">...</div>
+        </div>
+
+        <!-- Área de Anotações -->
+        <div class="det-sessao caixa-anotacoes">
+          <h3>Minhas Anotações</h3>
+          <textarea id="detNota" placeholder="Escreva estratégias ou notas sobre este Pokémon..."></textarea>
+          <span id="notaSalvaMsg" class="nota-salva-msg">Salvo automaticamente! ✓</span>
+        </div>
       </div>
     </aside>
 

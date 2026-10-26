@@ -9,6 +9,7 @@
   --texto: #313131;
 }
 
+/* ===== Base ===== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -23,6 +24,7 @@ body {
   display: none !important;
 }
 
+/* ===== Cabeçalho ===== */
 .cabecalho {
   position: relative;
   z-index: 10;
@@ -74,11 +76,13 @@ body {
   width: auto;    /* mantém a proporção da imagem */
 }
 
+/* ===== Layout ===== */
 .pokedex-container {
   display: flex;
   min-height: 100vh;
 }
 
+/* ===== Barra lateral (busca) ===== */
 .barra-lateral {
   position: fixed;
   top: 0;
@@ -116,6 +120,7 @@ body {
   color: black;
 }
 
+/* ===== Filtros ===== */
 .filtro {
   display: flex;
   flex-direction: column;
@@ -157,6 +162,7 @@ body {
   color: #ffffff;
 }
 
+/* ===== Conteúdo principal ===== */
 .main {
   flex: 1;
   min-width: 0; 
@@ -183,6 +189,7 @@ body {
   color: var(--texto);
 }
 
+/* ===== Lista e cards ===== */
 .pokemons {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -240,8 +247,9 @@ body {
   text-transform: capitalize;
 }
 
+/* ===== Barra de detalhes ===== */
 .detalhes {
-  width: 0;                     
+  width: 0;                    
   flex-shrink: 0;
   overflow: hidden;
   position: sticky;
@@ -349,8 +357,6 @@ body {
   background-color: var(--vermelho);
 }
 
-
-
 @media (prefers-reduced-motion: reduce) {
   .detalhes, .cartao-pokemon {
     transition: none;
@@ -395,4 +401,186 @@ body {
 #semFavoritos {
   margin: 0 0 20px;
   color: var(--texto);
+}
+
+/* ===== Novas Sessões de Detalhes ===== */
+.det-sessao {
+  margin: 15px 0;
+  text-align: left;
+}
+
+.det-sessao h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #eeeeee;
+  padding-bottom: 4px;
+}
+
+/* Caixa Azul de Informações */
+.det-caixa-info {
+  background-color: #30a7d7;
+  border-radius: 10px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+  color: white;
+  text-align: left;
+}
+
+.info-item span {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.info-item b {
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.info-item i {
+  font-size: 0.75rem;
+  font-weight: normal;
+}
+
+/* Shiny */
+.det-shiny {
+  text-align: center;
+}
+
+#detShiny {
+  width: 80px;
+  height: 80px;
+  background-color: #f8f8f8;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+/* Caixa Escura de Evoluções */
+.caixa-evolucoes {
+  background-color: #424242;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  color: white;
+}
+
+.caixa-evolucoes h3 {
+  color: white;
+  border-bottom-color: #555;
+}
+
+.evolucoes-lista {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.evo-item {
+  text-align: center;
+}
+
+.evo-item img {
+  width: 70px;
+  height: 70px;
+  background-color: #616161;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.evo-item p {
+  margin: 5px 0 0;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.evo-seta {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+/* Área de Anotações */
+.caixa-anotacoes {
+  position: relative;
+}
+
+#detNota {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 2px solid #cccccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  background-color: #fafafa;
+  color: var(--texto);
+}
+
+#detNota:focus {
+  outline: none;
+  border-color: var(--vermelho);
+  background-color: #ffffff;
+}
+
+.nota-salva-msg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.75rem;
+  color: #78c850;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Ataques e Itens */
+.cartao-item, .cartao-ataque {
+  padding: 20px;
+  border: 3px solid #cccccc;
+  border-radius: 12px;
+  background-color: #ffffff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cartao-item img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.cartao-item h3, .cartao-ataque h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  text-transform: capitalize;
+  color: var(--texto);
+}
+
+.cartao-item p {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+.cartao-ataque .stats-ataque {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--texto);
+}
+
+.cartao-ataque .stats-ataque p {
+  margin: 0;
 }
