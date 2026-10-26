@@ -327,6 +327,12 @@ body {
   font-size: 1.1rem;
 }
 
+#detSexo span {
+  font-size: 1.4rem;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
 .detalhes h3 {
   margin: 0 0 8px;
   text-align: left;
@@ -528,17 +534,6 @@ body {
   outline: none;
   border-color: var(--vermelho);
   background-color: #ffffff;
-}
-
-.nota-salva-msg {
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 0.75rem;
-  color: #78c850;
-  font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
 /* Ataques e Itens */

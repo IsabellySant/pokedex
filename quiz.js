@@ -1,4 +1,5 @@
 // Usa os Pokémon que o script.js já buscou na API (dadosPokemons)
+import { dadosPokemons } from './main.js';
 
 const botaoQuiz = document.querySelector('button.quiz');
 const quizQtdOpcoes = 4;
