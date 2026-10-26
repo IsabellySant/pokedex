@@ -1,4 +1,3 @@
-  // ===== Elementos =====
   const listaPokemon = document.getElementById('pokedex-lista');
   const contadorEl = document.getElementById('contador');
   const campoBusca = document.getElementById('searchInput');
@@ -7,11 +6,23 @@
   const filtroRegiao = document.getElementById('filtroRegiao');
   const botaoLimpar = document.getElementById('limparFiltros');
   const detalhes = document.getElementById('detalhes');
+  const abaPokemon = document.getElementById('abaPokemon');
+  const abaFavoritos = document.getElementById('abaFavoritos');
+  const tituloLista = document.getElementById('tituloLista');
+  const semFavoritos = document.getElementById('semFavoritos');
 
   const quantidadePokemons = 1025;
 
   // Guarda os dados de cada Pokémon para a barra de detalhes usar
   const dadosPokemons = {};
+
+  // Lê a lista salva no navegador (se não existir, começa vazia)
+  let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+  let mostrandoFavoritos = false;
+
+  function salvarFavoritos() {
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+  }
 
 
   // Cores das etiquetas de tipo e da borda do card
@@ -49,8 +60,8 @@
     paldea: ['paldea']
   };
 
-  // ===== Busca na API em Lotes =====
-  async function buscarPokemons() {
+// busca api  
+async function buscarPokemons() {
     const tamanhoLote = 50; // Quantidade de requisições simultâneas por vez
 
     // O loop avança pulando de 50 em 50
@@ -87,8 +98,6 @@
     return Number(url.split('/').filter(Boolean).pop());
   }
 
-  // Carrega quais Pokémon pertencem a cada geração
-  // Carrega quais Pokémon pertencem a cada geração (todas ao mesmo tempo)
   async function carregarGeracoes() {
     const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -143,7 +152,7 @@
     }));
   }
 
-  // ===== Criação do card =====
+// cria card
   function criarCardPokemon(pokemon) {
     const card = document.createElement('div');
     card.classList.add('cartao-pokemon');
@@ -174,8 +183,14 @@
 
     const imagemUrl = pokemon.sprites.front_default;
 
+    // Confere se este Pokémon já está na lista de favoritos
+    const ehFavorito = favoritos.includes(pokemon.id);
+
     card.innerHTML = `
       <div class="numero">#${idFormatado}</div>
+      <button type="button" class="botao-favorito${ehFavorito ? ' favoritado' : ''}" aria-label="Favoritar ${pokemon.name}" aria-pressed="${ehFavorito}">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
       <img src="${imagemUrl}" alt="${pokemon.name}" class="imagem-pokemon">
       <h2 class="nome-pokemon">${pokemon.name}</h2>
       <div class="tipos">
@@ -190,13 +205,12 @@
     atualizarContador();
   }
 
-  // ===== Contador =====
+// contaodor
   function atualizarContador() {
     const exibidos = listaPokemon.querySelectorAll('.cartao-pokemon:not([hidden])').length;
     contadorEl.textContent = `Exibindo ${exibidos} de ${quantidadePokemons}`;
   }
 
-  // ===== Filtros =====
 
   // Verifica se o id está no conjunto escolhido (sem filtro = passa)
   function pertence(id, conjuntos, valor) {
@@ -220,7 +234,10 @@
     const combinaGeracao = pertence(id, geracoes, filtroGeracao.value);
     const combinaRegiao = pertence(id, regioes, filtroRegiao.value);
 
-    return combinaTexto && combinaTipo && combinaGeracao && combinaRegiao;
+    // Na aba Favoritos, só passa quem está na lista de favoritos
+    const combinaFavorito = !mostrandoFavoritos || favoritos.includes(id);
+
+    return combinaTexto && combinaTipo && combinaGeracao && combinaRegiao && combinaFavorito;
   }
 
   // Mostra ou esconde os cards conforme os filtros
@@ -230,6 +247,9 @@
     cards.forEach((card) => {
       card.hidden = !combinaComBusca(card);
     });
+
+    // Mensagem para quando não há nenhum favorito
+    semFavoritos.hidden = !(mostrandoFavoritos && favoritos.length === 0);
 
     atualizarContador();
   }
@@ -244,7 +264,6 @@
     filtrarPokemons();
   }
 
-  // ===== Barra de detalhes =====
   function abrirDetalhes(id, card) {
     const pokemon = dadosPokemons[id];
     if (!pokemon) return;
@@ -288,7 +307,6 @@
     listaPokemon.querySelectorAll('.ativo').forEach(c => c.classList.remove('ativo'));
   }
 
-  // ===== Eventos =====
   campoBusca.addEventListener('input', filtrarPokemons);
   filtroTipo.addEventListener('change', filtrarPokemons);
   filtroGeracao.addEventListener('change', filtrarPokemons);
@@ -297,12 +315,21 @@
 
   // Clique (ou Enter) em qualquer card abre a barra de detalhes
   listaPokemon.addEventListener('click', (e) => {
+    // Clicou no coração: só favorita, não abre os detalhes
+    const coracao = e.target.closest('.botao-favorito');
+    if (coracao) {
+      const cardDoCoracao = coracao.closest('.cartao-pokemon');
+      alternarFavorito(Number(cardDoCoracao.dataset.id), coracao);
+      return;
+    }
+
     const card = e.target.closest('.cartao-pokemon');
     if (card) abrirDetalhes(card.dataset.id, card);
   });
 
   listaPokemon.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
+    if (e.target.closest('.botao-favorito')) return;
     const card = e.target.closest('.cartao-pokemon');
     if (card) abrirDetalhes(card.dataset.id, card);
   });
@@ -312,7 +339,40 @@
     if (e.key === 'Escape') fecharDetalhes();
   });
 
-  // ===== Início =====
+
+  // Marca ou desmarca o favorito e salva no navegador
+  function alternarFavorito(id, botao) {
+    if (favoritos.includes(id)) {
+      favoritos = favoritos.filter(f => f !== id);
+    } else {
+      favoritos.push(id);
+    }
+
+    salvarFavoritos();
+
+    const favoritado = favoritos.includes(id);
+    botao.classList.toggle('favoritado', favoritado);
+    botao.setAttribute('aria-pressed', favoritado);
+
+    // Na aba Favoritos, o card desmarcado some da lista
+    if (mostrandoFavoritos) filtrarPokemons();
+  }
+
+  // Troca entre a aba Pokémon e a aba Favoritos
+  function mudarAba(abrirFavoritos) {
+    mostrandoFavoritos = abrirFavoritos;
+
+    abaPokemon.classList.toggle('ativo', !abrirFavoritos);
+    abaFavoritos.classList.toggle('ativo', abrirFavoritos);
+    tituloLista.textContent = abrirFavoritos ? 'Favoritos' : 'Todos os pokemons';
+
+    filtrarPokemons();
+  }
+
+  abaPokemon.addEventListener('click', () => mudarAba(false));
+  abaFavoritos.addEventListener('click', () => mudarAba(true));
+
+// inciio
   async function iniciar() {
     atualizarContador();
     buscarPokemons();              // os cards continuam chegando normalmente

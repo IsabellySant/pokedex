@@ -9,7 +9,6 @@
   --texto: #313131;
 }
 
-/* ===== Base ===== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -24,7 +23,6 @@ body {
   display: none !important;
 }
 
-/* ===== Cabeçalho ===== */
 .cabecalho {
   position: relative;
   z-index: 10;
@@ -72,17 +70,15 @@ body {
 
 .quiz img {
   display: block;
-  height: 32px;   /* o cabeçalho tem 80px, então mantenha abaixo de ~50px */
+  height: 32px;   
   width: auto;    /* mantém a proporção da imagem */
 }
 
-/* ===== Layout ===== */
 .pokedex-container {
   display: flex;
   min-height: 100vh;
 }
 
-/* ===== Barra lateral (busca) ===== */
 .barra-lateral {
   position: fixed;
   top: 0;
@@ -120,7 +116,6 @@ body {
   color: black;
 }
 
-/* ===== Filtros ===== */
 .filtro {
   display: flex;
   flex-direction: column;
@@ -162,10 +157,9 @@ body {
   color: #ffffff;
 }
 
-/* ===== Conteúdo principal ===== */
 .main {
   flex: 1;
-  min-width: 0; /* evita estourar quando a barra de detalhes abre */
+  min-width: 0; 
   margin-left: var(--largura-barra);
   padding: 30px;
   background-color: var(--amarelo);
@@ -189,7 +183,6 @@ body {
   color: var(--texto);
 }
 
-/* ===== Lista e cards ===== */
 .pokemons {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -247,9 +240,8 @@ body {
   text-transform: capitalize;
 }
 
-/* ===== Barra de detalhes ===== */
 .detalhes {
-  width: 0;                      /* fechada */
+  width: 0;                     
   flex-shrink: 0;
   overflow: hidden;
   position: sticky;
@@ -265,7 +257,6 @@ body {
   border-left-width: 4px;
 }
 
-/* Largura fixa por dentro: o texto não fica espremido durante a animação */
 .detalhes-interna {
   width: 400px;
   height: 100%;
@@ -358,21 +349,50 @@ body {
   background-color: var(--vermelho);
 }
 
-/* Celular: a barra de detalhes vira um painel por cima da tela */
-@media (max-width: 800px) {
-  .detalhes {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 200;
-  }
-  .detalhes.aberta {
-    width: min(320px, 100vw);
-  }
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   .detalhes, .cartao-pokemon {
     transition: none;
   }
+}
+
+/* fav */
+.cartao-pokemon {
+  position: relative;
+}
+
+.botao-favorito {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b10909;
+  cursor: pointer;
+}
+
+.botao-favorito svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.botao-favorito.favoritado svg {
+  fill: currentColor;
+}
+
+.botao-favorito:focus-visible {
+  outline: 2px solid var(--vermelho);
+  border-radius: 50%;
+}
+
+#semFavoritos {
+  margin: 0 0 20px;
+  color: var(--texto);
 }

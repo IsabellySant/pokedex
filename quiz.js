@@ -35,7 +35,6 @@ telaQuiz.innerHTML = `
 
 document.body.appendChild(telaQuiz);
 
-// Elementos de dentro da tela
 const jogoFechar = document.getElementById('jogoFechar');
 const jogoAcertos = document.getElementById('jogoAcertos');
 const jogoTotal = document.getElementById('jogoTotal');
@@ -65,7 +64,6 @@ function novaPergunta() {
   jogoOpcoes.innerHTML = '';
   jogoProximo.hidden = true;
 
-  // Ainda não carregou Pokémon suficientes
   if (disponiveis.length < quizQtdOpcoes) {
     jogoImagem.removeAttribute('src');
     jogoMensagem.textContent = 'Carregando Pokémon... tente de novo em instantes.';
@@ -109,7 +107,6 @@ function responder(escolhido, botaoClicado) {
     botaoClicado.classList.add('errada');
   }
 
-  // Marca a certa e bloqueia todos os botões
   jogoOpcoes.querySelectorAll('.jogo-opcao').forEach(botao => {
     if (Number(botao.dataset.id) === quizCerto.id) {
       botao.classList.add('certa');
@@ -144,12 +141,8 @@ botaoQuiz.addEventListener('click', abrirQuiz);
 jogoFechar.addEventListener('click', fecharQuiz);
 jogoProximo.addEventListener('click', novaPergunta);
 
-// Clicar no fundo escuro também fecha
-telaQuiz.addEventListener('click', (e) => {
-  if (e.target === telaQuiz) fecharQuiz();
-});
 
-// Esc fecha o quiz
+// Esc 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !telaQuiz.hidden) fecharQuiz();
 });

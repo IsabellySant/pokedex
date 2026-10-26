@@ -14,9 +14,10 @@
   <header class="cabecalho">
     <nav>
       <ul>
-        <li><button class="ativo">Pokémon</button></li>
+        <li><button class="ativo" id="abaPokemon">Pokémon</button></li>
         <li><button>Ataques</button></li>
         <li><button>Itens</button></li>
+        <li><button id="abaFavoritos">Favoritos</button></li>
         <li><button class="quiz" aria-label="quizpokemon"> <img src="imagens/mimikyuquizz.png" alt="" width="32"
               height="32"></button></li>
       </ul>
@@ -25,7 +26,6 @@
 
   <div class="pokedex-container">
 
-    <!-- Barra lateral (busca) -->
     <aside class="barra-lateral">
       <img src="imagens/logo.png" alt="Logo Pokedex Linow">
 
@@ -94,16 +94,17 @@
     <!-- Conteúdo principal -->
     <main class="main">
       <div class="titulo-pagina">
-        <h3>Todos os pokemons</h3>
+        <h3 id="tituloLista">Todos os pokemons</h3>
         <p id="contador"></p>
       </div>
+
+      <p id="semFavoritos" hidden>Você ainda não favoritou nenhum Pokémon.</p>
 
       <div class="pokemons" id="pokedex-lista">
         <!-- aqui vão os cards -->
       </div>
     </main>
 
-    <!-- Barra de detalhes (começa fechada) -->
     <aside class="detalhes" id="detalhes" aria-hidden="true">
       <div class="detalhes-interna">
         <button type="button" class="detalhes-fechar" id="detalhesFechar" aria-label="Fechar">✕</button>

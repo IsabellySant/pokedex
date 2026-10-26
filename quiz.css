@@ -55,7 +55,7 @@
     font-weight: bold;
 }
 
-/* Moldura: guarda o fundo branco e a borda (fica FORA do filtro) */
+/* guarda o fundo branco e a borda */
 .jogo-moldura {
     width: 200px;
     height: 200px;
@@ -70,12 +70,11 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    image-rendering: pixelated;
-    /* os sprites são pequenos, assim ficam nítidos */
+    image-rendering: pixelated;/* os sprites são pequenos, assim ficam nítidos */
     transition: filter 0.4s;
 }
 
-/* A silhueta: o desenho do Pokémon fica todo preto */
+/* o desenho do Pokémon fica todo preto */
 .jogo-imagem.silhueta {
     filter: brightness(0);
 }
@@ -88,7 +87,6 @@
     text-transform: capitalize;
 }
 
-/* Opções em 2 colunas */
 .jogo-opcoes {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
