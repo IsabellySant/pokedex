@@ -71,13 +71,14 @@
     height: 100%;
     object-fit: contain;
     image-rendering: pixelated;/* os sprites são pequenos, assim ficam nítidos */
-    transition: filter 0.4s;
 }
 
 /* o desenho do Pokémon fica todo preto */
 .jogo-imagem.silhueta {
     filter: brightness(0);
 }
+
+
 
 .jogo-mensagem {
     min-height: 1.5rem;
