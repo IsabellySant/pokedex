@@ -1,71 +1,105 @@
 // ====== main.js ====== //
-import { 
-  quantidadePokemons, 
-  LIMITE_ITENS, 
-  LIMITE_ATAQUES, 
-  pokedexRegioes, 
-  idDaUrl, 
-  getPokemon, 
-  getDados 
+import {
+  quantidadePokemons,
+  limiteItens,
+  limiteAtaques,
+  pokedexRegioes,
+  idDaUrl,
+  getPokemon,
+  getDados
 } from './api.js';
 
-import { 
+import {
   criarCardPokemonHTML,
   criarCardItemHTML,
-  criarCardAtaqueHTML, 
+  criarCardAtaqueHTML,
   preencherDetalhesUI,
   fecharDetalhesUI
 } from './ui.js';
 
 // ===== Elementos do DOM =====
 const listaPokemon = document.getElementById('pokedex-lista');
+const listaAtaques = document.getElementById('lista-ataques');
+const listaItens = document.getElementById('lista-itens');
 const contadorEl = document.getElementById('contador');
 const campoBusca = document.getElementById('searchInput');
 const filtroTipo = document.getElementById('filtroTipo');
 const filtroGeracao = document.getElementById('filtroGeracao');
 const filtroRegiao = document.getElementById('filtroRegiao');
 const botaoLimpar = document.getElementById('limparFiltros');
-const abaPokemon = document.getElementById('abaPokemon');
-const abaFavoritos = document.getElementById('abaFavoritos');
-const abaAtaques = document.getElementById('abaAtaques');
-const abaItens = document.getElementById('abaItens');
-const listaAtaques = document.getElementById('lista-ataques');
-const listaItens = document.getElementById('lista-itens');
 const tituloLista = document.getElementById('tituloLista');
 const semFavoritos = document.getElementById('semFavoritos');
 
-// ===== Estados (Variáveis Globais) =====
+// ===== Estados =====
 export const dadosPokemons = {};
-const geracoes = {}; 
-const regioes = {}; 
+const geracoes = {};
+const regioes = {};
+const tamanhoLote = 50;
 
 let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
 let notasPokemons = JSON.parse(localStorage.getItem('notasPokemons')) || {};
 let mostrandoFavoritos = false;
+let abaAtual = 'pokemon';
 
 function salvarFavoritos() { localStorage.setItem('favoritos', JSON.stringify(favoritos)); }
 function salvarNotas() { localStorage.setItem('notasPokemons', JSON.stringify(notasPokemons)); }
 
-// ===== Funções de Inicialização (Pokémons) =====
+// ===== Configuração das abas =====
+// Para criar uma aba nova, basta adicionar uma linha aqui e adicionar o botao no html
+// Abas com "url" carregam uma lista da API na primeira vez que são abertas.
+const abas = {
+  pokemon: {
+    botao: document.getElementById('abaPokemon'),
+    lista: listaPokemon,
+    titulo: 'Todos os pokémons'
+  },
+  favoritos: {
+    botao: document.getElementById('abaFavoritos'),
+    lista: listaPokemon,
+    titulo: 'Favoritos'
+  },
+  ataques: {
+    botao: document.getElementById('abaAtaques'),
+    lista: listaAtaques,
+    titulo: 'Ataques',
+    nome: 'ataques',
+    url: `https://pokeapi.co/api/v2/move?limit=${limiteAtaques}`,
+    criarCard: criarCardAtaqueHTML,
+    carregado: false
+  },
+  itens: {
+    botao: document.getElementById('abaItens'),
+    lista: listaItens,
+    titulo: 'Itens',
+    nome: 'itens',
+    url: `https://pokeapi.co/api/v2/item?limit=${limiteItens}`,
+    criarCard: criarCardItemHTML,
+    carregado: false
+  }
+};
+
+// ===== Carregamento inicial dos Pokémons =====
 async function buscarPokemonsLotes() {
-  const tamanhoLote = 50;
   for (let i = 1; i <= quantidadePokemons; i += tamanhoLote) {
     const promessas = [];
     for (let j = i; j < i + tamanhoLote && j <= quantidadePokemons; j++) {
       promessas.push(getPokemon(j));
     }
+
     try {
       const listaDePokemons = await Promise.all(promessas);
       listaDePokemons.forEach(pokemon => {
-        dadosPokemons[pokemon.id] = pokemon; // Guarda para usar nos detalhes
+        dadosPokemons[pokemon.id] = pokemon;
         const ehFavorito = favoritos.includes(pokemon.id);
         const card = criarCardPokemonHTML(pokemon, ehFavorito);
-        
-        card.hidden = !combinaComBusca(card); // Aplica filtros imediatamente
+
+        card.hidden = !combinaComBusca(card);
         listaPokemon.appendChild(card);
       });
       atualizarContador();
-    } catch (erro) { console.error(erro); }
+    } catch (erro) {
+      console.error(erro);
+    }
   }
 }
 
@@ -76,8 +110,7 @@ async function carregarGeracoesERegioes() {
     geracoes[g] = new Set(dados.pokemon_species.map(e => idDaUrl(e.url)));
   }));
 
-  const nomesRegioes = Object.keys(pokedexRegioes);
-  await Promise.all(nomesRegioes.map(async (regiao) => {
+  await Promise.all(Object.keys(pokedexRegioes).map(async (regiao) => {
     const ids = new Set();
     await Promise.all(pokedexRegioes[regiao].map(async (nomePokedex) => {
       const dados = await getDados(`https://pokeapi.co/api/v2/pokedex/${nomePokedex}`);
@@ -87,7 +120,7 @@ async function carregarGeracoesERegioes() {
   }));
 }
 
-// ===== Funções de Filtros =====
+// ===== Filtros =====
 function atualizarContador() {
   const exibidos = listaPokemon.querySelectorAll('.cartao-pokemon:not([hidden])').length;
   contadorEl.textContent = `Exibindo ${exibidos} de ${quantidadePokemons}`;
@@ -102,7 +135,9 @@ function pertence(id, conjuntos, valor) {
 
 function combinaComBusca(card) {
   const termo = campoBusca.value.trim().toLowerCase();
-  const combinaTexto = card.querySelector('.nome-pokemon').textContent.toLowerCase().includes(termo) || card.querySelector('.numero').textContent.includes(termo);
+  const combinaTexto =
+    card.querySelector('.nome-pokemon').textContent.toLowerCase().includes(termo) ||
+    card.querySelector('.numero').textContent.includes(termo);
   const combinaTipo = !filtroTipo.value || card.dataset.tipos.split(' ').includes(filtroTipo.value);
   const id = Number(card.dataset.id);
   const combinaGeracao = pertence(id, geracoes, filtroGeracao.value);
@@ -120,15 +155,34 @@ function filtrarPokemons() {
   atualizarContador();
 }
 
+// Busca simples por texto, usada nas listas de ataques e itens.
+function filtrarPorTexto(lista) {
+  const termo = campoBusca.value.trim().toLowerCase();
+  [...lista.children].forEach(card => {
+    if (card.tagName === 'P') return; // mensagens de "carregando" / "erro"
+    card.hidden = !card.textContent.toLowerCase().includes(termo);
+  });
+}
+
+// Decide qual filtro usar conforme a aba aberta
+function aplicarFiltros() {
+  const aba = abas[abaAtual];
+  if (aba.url) {
+    filtrarPorTexto(aba.lista);
+  } else {
+    filtrarPokemons();
+  }
+}
+
 function limparFiltros() {
   campoBusca.value = '';
   filtroTipo.value = '';
   filtroGeracao.value = '';
   filtroRegiao.value = '';
-  filtrarPokemons();
+  aplicarFiltros();
 }
 
-// ===== Lógica da Barra Lateral =====
+// ===== Painel de detalhes =====
 function abrirDetalhes(id, card) {
   const pokemon = dadosPokemons[id];
   if (!pokemon) return;
@@ -136,14 +190,12 @@ function abrirDetalhes(id, card) {
   listaPokemon.querySelectorAll('.ativo').forEach(c => c.classList.remove('ativo'));
   card.classList.add('ativo');
 
-  // Lógica enviada para o arquivo UI
-  const notaAtual = notasPokemons[id];
   const callbackSalvarNota = (idPokemon, texto) => {
     notasPokemons[idPokemon] = texto;
     salvarNotas();
   };
 
-  preencherDetalhesUI(pokemon, notaAtual, callbackSalvarNota);
+  preencherDetalhesUI(pokemon, notasPokemons[id], callbackSalvarNota);
 }
 
 function fecharDetalhes() {
@@ -151,7 +203,7 @@ function fecharDetalhes() {
   listaPokemon.querySelectorAll('.ativo').forEach(c => c.classList.remove('ativo'));
 }
 
-// ===== Lógica dos Favoritos =====
+// ===== Favoritos =====
 function alternarFavorito(id, botao) {
   if (favoritos.includes(id)) {
     favoritos = favoritos.filter(f => f !== id);
@@ -159,93 +211,90 @@ function alternarFavorito(id, botao) {
     favoritos.push(id);
   }
   salvarFavoritos();
-  
+
   const favoritado = favoritos.includes(id);
   botao.classList.toggle('favoritado', favoritado);
   botao.setAttribute('aria-pressed', favoritado);
   if (mostrandoFavoritos) filtrarPokemons();
 }
 
-// ===== Lógica de Abas, Itens e Ataques =====
-function mudarAba(aba) {
-  listaPokemon.hidden = true;
-  listaAtaques.hidden = true;
-  listaItens.hidden = true;
+// ===== Abas =====
+function mudarAba(nome) {
+  abaAtual = nome;
+
+  // Esconde todas as listas e desmarca todos os botões
+  Object.values(abas).forEach(({ botao, lista }) => {
+    botao.classList.remove('ativo');
+    lista.hidden = true;
+  });
+
+  // Mostra a aba escolhida
+  const aba = abas[nome];
+  aba.botao.classList.add('ativo');
+  aba.lista.hidden = false;
+  tituloLista.textContent = aba.titulo;
+
+  mostrandoFavoritos = nome === 'favoritos';
   semFavoritos.hidden = true;
 
-  abaPokemon.classList.remove('ativo');
-  abaFavoritos.classList.remove('ativo');
-  abaAtaques.classList.remove('ativo');
-  abaItens.classList.remove('ativo');
-
-  if (aba === 'pokemon') {
-    mostrandoFavoritos = false;
-    abaPokemon.classList.add('ativo');
-    listaPokemon.hidden = false;
-    tituloLista.textContent = 'Todos os pokémons';
-    filtrarPokemons();
-  } else if (aba === 'favoritos') {
-    mostrandoFavoritos = true;
-    abaFavoritos.classList.add('ativo');
-    listaPokemon.hidden = false;
-    tituloLista.textContent = 'Favoritos';
-    filtrarPokemons();
-  } else if (aba === 'ataques') {
-    abaAtaques.classList.add('ativo');
-    listaAtaques.hidden = false;
-    tituloLista.textContent = 'Ataques';
+  if (aba.url) {
+    // Aba de ataques ou itens
     contadorEl.textContent = '';
-    if (listaAtaques.innerHTML === '') buscarAtaques();
-  } else if (aba === 'itens') {
-    abaItens.classList.add('ativo');
-    listaItens.hidden = false;
-    tituloLista.textContent = 'Itens';
-    contadorEl.textContent = '';
-    if (listaItens.innerHTML === '') buscarItens();
+    if (!aba.carregado) {
+      carregarLista(aba);
+    } else {
+      filtrarPorTexto(aba.lista);
+    }
+  } else {
+    // Aba de Pokémons ou Favoritos
+    filtrarPokemons();
   }
 }
 
-async function buscarItens() {
-  listaItens.innerHTML = '<p>Carregando itens...</p>';
-  try {
-    const data = await getDados(`https://pokeapi.co/api/v2/item?limit=${LIMITE_ITENS}`);
-    listaItens.innerHTML = '';
-    
-    data.results.forEach(async (item) => {
-      const info = await getDados(item.url);
-      listaItens.appendChild(criarCardItemHTML(info));
-    });
-  } catch (e) { console.error("Erro nos itens:", e); }
-}
+// Carrega uma lista da API (ataques ou itens) em lotes de 50
+async function carregarLista(aba) {
+  const { lista, url, criarCard, nome } = aba;
 
-// Busca todos os ataques na primeira visita à aba
-async function buscarAtaques() {
-  listaAtaques.innerHTML = '<p>Carregando ataques...</p>';
+  aba.carregado = true;
+  lista.innerHTML = `<p>Carregando ${nome}...</p>`;
+
   try {
-    const data = await getDados(`https://pokeapi.co/api/v2/move?limit=${LIMITE_ATAQUES}`);
-    listaAtaques.innerHTML = '';
-    
-    data.results.forEach(async (ataque) => {
-      const info = await getDados(ataque.url);
-      listaAtaques.appendChild(criarCardAtaqueHTML(info));
-    });
-  } catch (e) { console.error("Erro nos ataques:", e); }
+    const { results } = await getDados(url);
+    lista.innerHTML = '';
+
+    for (let i = 0; i < results.length; i += tamanhoLote) {
+      const lote = results.slice(i, i + tamanhoLote);
+
+      try {
+        const dados = await Promise.all(lote.map(r => getDados(r.url)));
+        dados.forEach(info => lista.appendChild(criarCard(info)));
+        filtrarPorTexto(lista); // respeita o que já foi digitado na busca
+      } catch (erroLote) {
+        console.error(`Erro ao carregar lote de ${nome} (${i} a ${i + tamanhoLote}):`, erroLote);
+      }
+    }
+  } catch (erro) {
+    console.error(`Erro geral em ${nome}:`, erro);
+    lista.innerHTML = `<p>Erro ao carregar ${nome}.</p>`;
+    aba.carregado = false; // permite tentar de novo ao clicar na aba
+  }
 }
 
 // ===== Event Listeners =====
-campoBusca.addEventListener('input', filtrarPokemons);
-filtroTipo.addEventListener('change', filtrarPokemons);
-filtroGeracao.addEventListener('change', filtrarPokemons);
-filtroRegiao.addEventListener('change', filtrarPokemons);
+campoBusca.addEventListener('input', aplicarFiltros);
+filtroTipo.addEventListener('change', aplicarFiltros);
+filtroGeracao.addEventListener('change', aplicarFiltros);
+filtroRegiao.addEventListener('change', aplicarFiltros);
 botaoLimpar.addEventListener('click', limparFiltros);
 document.getElementById('detalhesFechar').addEventListener('click', fecharDetalhes);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharDetalhes(); });
 
-abaPokemon.addEventListener('click', () => mudarAba('pokemon'));
-abaFavoritos.addEventListener('click', () => mudarAba('favoritos'));
-abaAtaques.addEventListener('click', () => mudarAba('ataques'));
-abaItens.addEventListener('click', () => mudarAba('itens'));
+// Um listener para cada aba, criado a partir da tabela
+Object.keys(abas).forEach(nome => {
+  abas[nome].botao.addEventListener('click', () => mudarAba(nome));
+});
 
+// Clique na lista de Pokémons (delegação de eventos)
 listaPokemon.addEventListener('click', (e) => {
   const coracao = e.target.closest('.botao-favorito');
   if (coracao) {
@@ -260,8 +309,14 @@ listaPokemon.addEventListener('click', (e) => {
 // ===== Início =====
 async function iniciar() {
   atualizarContador();
-  buscarPokemonsLotes();
-  await carregarGeracoesERegioes();
+  buscarPokemonsLotes(); // roda em paralelo, sem await
+
+  try {
+    await carregarGeracoesERegioes();
+  } catch (erro) {
+    console.error('Erro ao carregar gerações e regiões:', erro);
+  }
+
   filtrarPokemons();
 }
 

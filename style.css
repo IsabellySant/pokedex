@@ -1,12 +1,10 @@
 /* ===== Variáveis ===== */
 :root {
   --largura-barra: 200px;
-  --altura-cabecalho: 80px;
-  --vermelho: #f8cd4d;
   --altura-cabecalho: 60px;
-  --vermelho: #e3350d;
-  --amarelo: #f6eeaa;
-  --texto: #313131;
+  --vermelho: #dc2626;
+  --fundo: #f9e692;
+  --texto: #000000;
 }
 
 /* ===== Base ===== */
@@ -33,7 +31,7 @@ body {
   justify-content: center;
   height: var(--altura-cabecalho);
   padding-left: var(--largura-barra); /* centraliza na área ao lado da barra */
-  background-color: #ffb731;
+  background-color: #f59e0b;
 }
 
 .cabecalho nav ul {
@@ -72,7 +70,7 @@ body {
 
 .quiz img {
   display: block;
-  height: 32px;   
+  height: 32px;
   width: auto;    /* mantém a proporção da imagem */
 }
 
@@ -165,10 +163,10 @@ body {
 /* ===== Conteúdo principal ===== */
 .main {
   flex: 1;
-  min-width: 0; 
+  min-width: 0;
   margin-left: var(--largura-barra);
   padding: 30px;
-  background-color: var(--amarelo);
+  background-color: var(--fundo);
 }
 
 .titulo-pagina {
@@ -236,6 +234,7 @@ body {
   display: flex;
   justify-content: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .tipo {
@@ -249,7 +248,7 @@ body {
 
 /* ===== Barra de detalhes ===== */
 .detalhes {
-  width: 0;                    
+  width: 0;
   flex-shrink: 0;
   overflow: hidden;
   position: sticky;
@@ -294,7 +293,7 @@ body {
   text-align: center;
   width: 190px;
   height: 190px;
-  margin: 30px auto 0; /* Mantém a centralização base */
+  margin: 30px auto 0;
   transform: translateX(10px);
   background-color: #ffffff;
   border: 8px solid #a0a0a0;
@@ -363,13 +362,7 @@ body {
   background-color: var(--vermelho);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .detalhes, .cartao-pokemon {
-    transition: none;
-  }
-}
-
-/* fav */
+/* ===== Favoritos ===== */
 .cartao-pokemon {
   position: relative;
 }
@@ -409,7 +402,7 @@ body {
   color: var(--texto);
 }
 
-/* ===== Novas Sessões de Detalhes ===== */
+/* ===== Sessões de detalhes ===== */
 .det-sessao {
   margin: 15px 0;
   text-align: left;
@@ -422,7 +415,7 @@ body {
   padding-bottom: 4px;
 }
 
-/* Caixa Azul de Informações */
+/* Caixa azul de informações */
 .det-caixa-info {
   background-color: #30a7d7;
   border-radius: 10px;
@@ -465,7 +458,7 @@ body {
   margin: 0 auto;
 }
 
-/* Caixa Escura de Evoluções */
+/* Caixa escura de evoluções */
 .caixa-evolucoes {
   background-color: #424242;
   border-radius: 10px;
@@ -480,6 +473,15 @@ body {
 }
 
 .evolucoes-lista {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Um estágio = um ou mais Pokémon no mesmo nível da evolução (ex.: as evoluções do Eevee) */
+.evo-estagio {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +514,7 @@ body {
   font-weight: bold;
 }
 
-/* Área de Anotações */
+/* Área de anotações */
 .caixa-anotacoes {
   position: relative;
 }
@@ -536,7 +538,7 @@ body {
   background-color: #ffffff;
 }
 
-/* Ataques e Itens */
+/* ===== Ataques e Itens ===== */
 .cartao-item, .cartao-ataque {
   padding: 20px;
   border: 3px solid #cccccc;

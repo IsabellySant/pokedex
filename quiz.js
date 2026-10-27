@@ -1,4 +1,4 @@
-// Usa os Pokémon que o script.js já buscou na API (dadosPokemons)
+// Usa os Pokémon que o main.js já buscou na API (dadosPokemons)
 import { dadosPokemons } from './main.js';
 
 const botaoQuiz = document.querySelector('button.quiz');
@@ -22,7 +22,7 @@ telaQuiz.innerHTML = `
     <h2 class="jogo-titulo" id="jogoTitulo">Quem é esse Pokémon?</h2>
     <p class="jogo-placar">Acertos: <span id="jogoAcertos">0</span> / <span id="jogoTotal">0</span></p>
 
-<div class="jogo-moldura">
+    <div class="jogo-moldura">
       <img id="jogoImagem" class="jogo-imagem silhueta" src="" alt="Silhueta de um Pokémon">
     </div>
 
@@ -121,7 +121,7 @@ function responder(escolhido, botaoClicado) {
   jogoProximo.focus();
 }
 
-// abre e fecha
+// Abre e fecha
 function abrirQuiz() {
   quizAcertos = 0;
   quizRodadas = 0;
@@ -142,8 +142,7 @@ botaoQuiz.addEventListener('click', abrirQuiz);
 jogoFechar.addEventListener('click', fecharQuiz);
 jogoProximo.addEventListener('click', novaPergunta);
 
-
-// Esc 
+// Esc fecha o quiz
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !telaQuiz.hidden) fecharQuiz();
 });

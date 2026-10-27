@@ -52,6 +52,9 @@
             <option value="ghost">Fantasma</option>
             <option value="ice">Gelo</option>
             <option value="dragon">Dragão</option>
+            <option value="steel">Aço</option>
+            <option value="dark">Sombrio</option>
+            <option value="flying">Voador</option>
           </select>
         </div>
 
@@ -94,17 +97,15 @@
     <!-- Conteúdo principal -->
     <main class="main">
       <div class="titulo-pagina">
-        <h3 id="tituloLista">Todos os pokemons</h3>
+        <h3 id="tituloLista">Todos os pokémons</h3>
         <p id="contador"></p>
       </div>
 
       <p id="semFavoritos" hidden>Você ainda não favoritou nenhum Pokémon.</p>
 
-      <div class="pokemons" id="pokedex-lista">
-        <!-- aqui vão os cards -->
-      </div>
-      
-      <!-- Novas listas de itens e ataques ocultas por padrão -->
+      <div class="pokemons" id="pokedex-lista"></div>
+
+      <!-- Listas de ataques e itens, ocultas por padrão -->
       <div class="pokemons" id="lista-ataques" hidden></div>
       <div class="pokemons" id="lista-itens" hidden></div>
     </main>
@@ -172,7 +173,6 @@
 
   </div>
 
-  
   <script type="module" src="main.js"></script>
   <script type="module" src="quiz.js"></script>
 

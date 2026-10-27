@@ -1,32 +1,18 @@
 // ====== ui.js ====== //
 import { idDaUrl, getDados } from './api.js';
+import { coresEtiquetas, corPadrao, nomesStatus } from './constantes.js';
 
-// CONFIGURAÇÕES E TABELAS DE TRADUÇÃO
+// ===== FUNÇÕES AUXILIARES DE FORMATAÇÃO =====
 
-export const coresEtiquetas = {
-  grass: '#78c850', fire: '#f08030', water: '#6890f0', bug: '#a8b820',
-  normal: '#a8a878', poison: '#a040a0', electric: '#f8d030', ground: '#e0c068',
-  fairy: '#ee99ac', fighting: '#c03028', psychic: '#f85888', rock: '#b8a038',
-  ghost: '#705898', ice: '#98d8d8', dragon: '#7038f8'
-};
+// Uma etiqueta colorida de tipo (usada em tipos, fraquezas e ataques)
+function etiquetaTipo(nome) {
+  const cor = coresEtiquetas[nome] || corPadrao;
+  return `<span class="tipo" style="background-color: ${cor}">${nome}</span>`;
+}
 
-const nomesStatus = {
-  'hp': 'HP', 
-  'attack': 'Ataque', 
-  'defense': 'Defesa',
-  'special-attack': 'Ataque Esp.', 
-  'special-defense': 'Defesa Esp.', 
-  'speed': 'Velocidade'
-};
-
-// FUNÇÕES AUXILIARES DE FORMATAÇÃO
-
-// Gera as etiquetas coloridas de tipos
+// Gera as etiquetas dos tipos de um Pokémon
 function gerarEtiquetasTipos(types) {
-  return types.map(({ type }) => {
-    const cor = coresEtiquetas[type.name] || '#a8a878';
-    return `<span class="tipo" style="background-color: ${cor}">${type.name}</span>`;
-  }).join('');
+  return types.map(({ type }) => etiquetaTipo(type.name)).join('');
 }
 
 // Gera as barras e valores dos status base
@@ -55,26 +41,31 @@ function determinarSexoHTML(genderRate) {
   return '<span style="color: blue;">♂</span> <span style="color: #8d0202;">♀</span>';
 }
 
-// Monta recursivamente a lista da linha evolutiva
-function extrairEvolucoes(chain, lista = []) {
-  const { species, evolves_to } = chain;
-  lista.push({ nome: species.name, id: idDaUrl(species.url) });
+// Monta a linha evolutiva em estágios, já considerando ramificações.
+function extrairEstagios(chain) {
+  const estagios = [];
+  let nivel = [chain];
 
-  if (evolves_to.length > 0) {
-    extrairEvolucoes(evolves_to[0], lista);
+  while (nivel.length > 0) {
+    estagios.push(nivel.map(({ species }) => ({
+      nome: species.name,
+      id: idDaUrl(species.url)
+    })));
+    nivel = nivel.flatMap(no => no.evolves_to);
   }
-  return lista;
+
+  return estagios;
 }
 
-// CRIAÇÃO DOS CARDS DE LISTAGEM
+// ===== CRIAÇÃO DOS CARDS DE LISTAGEM =====
 
 export function criarCardPokemonHTML(pokemon, ehFavorito) {
   const { id, name, types, sprites } = pokemon;
   const primeiroTipo = types[0].type.name;
-  
+
   const card = document.createElement('div');
   card.classList.add('cartao-pokemon');
-  card.style.borderColor = coresEtiquetas[primeiroTipo] || '#a8a878';
+  card.style.borderColor = coresEtiquetas[primeiroTipo] || corPadrao;
   card.dataset.id = id;
   card.dataset.tipos = types.map(({ type }) => type.name).join(' ');
   card.tabIndex = 0;
@@ -100,10 +91,10 @@ export function criarCardPokemonHTML(pokemon, ehFavorito) {
 export function criarCardItemHTML({ name, sprites, effect_entries }) {
   const card = document.createElement('div');
   card.classList.add('cartao-item');
-  
+
   const efeito = effect_entries.find(({ language }) => language.name === 'en');
   const nomeFormatado = name.replace(/-/g, ' ');
-  
+
   card.innerHTML = `
     <img src="${sprites.default}" alt="${name}">
     <h3>${nomeFormatado}</h3>
@@ -116,13 +107,12 @@ export function criarCardItemHTML({ name, sprites, effect_entries }) {
 export function criarCardAtaqueHTML({ name, type, power, accuracy }) {
   const card = document.createElement('div');
   card.classList.add('cartao-ataque');
-  
-  const cor = coresEtiquetas[type.name] || '#a8a878';
+
   const nomeFormatado = name.replace(/-/g, ' ');
-  
+
   card.innerHTML = `
     <h3>${nomeFormatado}</h3>
-    <span class="tipo" style="background-color: ${cor}">${type.name}</span>
+    ${etiquetaTipo(type.name)}
     <div class="stats-ataque">
       <p>Poder: <b>${power || '-'}</b></p>
       <p>Precisão: <b>${accuracy || '-'}</b></p>
@@ -132,13 +122,13 @@ export function criarCardAtaqueHTML({ name, type, power, accuracy }) {
   return card;
 }
 
-// PAINEL LATERAL DE DETALHES
+// ===== PAINEL LATERAL DE DETALHES =====
 
 export async function preencherDetalhesUI(pokemon, notaAtual, callbackSalvarNota) {
   const { id, name, height, weight, types, abilities, stats, sprites, species } = pokemon;
   const detalhes = document.getElementById('detalhes');
-  
-  // 1. Preenchimento instantâneo (dados síncronos)
+
+  // 1. Preenchimento instantâneo (dados que já temos)
   document.getElementById('detImagem').src = sprites.front_default;
   document.getElementById('detNumero').textContent = '#' + String(id).padStart(3, '0');
   document.getElementById('detNome').textContent = name;
@@ -148,8 +138,8 @@ export async function preencherDetalhesUI(pokemon, notaAtual, callbackSalvarNota
   document.getElementById('detTipos').innerHTML = gerarEtiquetasTipos(types);
   document.getElementById('detStats').innerHTML = gerarBarrasStatus(stats);
 
-  document.getElementById('detHabilidades').innerHTML = abilities.map(({ ability, is_hidden }) => 
-    ability.name.replace('-', ' ') + (is_hidden ? ' <i>(Oculta)</i>' : '')
+  document.getElementById('detHabilidades').innerHTML = abilities.map(({ ability, is_hidden }) =>
+    ability.name.replace(/-/g, ' ') + (is_hidden ? ' <i>(Oculta)</i>' : '')
   ).join('<br>');
 
   // Imagem da versão Shiny
@@ -170,53 +160,52 @@ export async function preencherDetalhesUI(pokemon, notaAtual, callbackSalvarNota
   detalhes.classList.add('aberta');
   detalhes.setAttribute('aria-hidden', 'false');
 
-  // Placeholders para requisições assíncronas
+  // Placeholders enquanto as requisições extras não chegam
   document.getElementById('detCategoria').textContent = '...';
   document.getElementById('detSexo').innerHTML = '...';
   document.getElementById('detFraquezas').innerHTML = '...';
   document.getElementById('detEvolucoes').innerHTML = '...';
 
-  // Preenchimento assíncrono (requisições extras da API)
+  // 2. Preenchimento assíncrono (requisições extras da API)
   try {
-    // Busca e calcula fraquezas
-    const promessasTipos = types.map(({ type }) => getDados(type.url));
-    const dadosTipos = await Promise.all(promessasTipos);
-    const fraquezasSet = new Set();
-    
+    // Fraquezas
+    const dadosTipos = await Promise.all(types.map(({ type }) => getDados(type.url)));
+    const fraquezas = new Set();
+
     dadosTipos.forEach(tipoData => {
       tipoData.damage_relations.double_damage_from.forEach(({ name: nomeFraqueza }) => {
-        fraquezasSet.add(nomeFraqueza);
+        fraquezas.add(nomeFraqueza);
       });
     });
-    
-    document.getElementById('detFraquezas').innerHTML = Array.from(fraquezasSet).map(f => 
-      `<span class="tipo" style="background-color: ${coresEtiquetas[f] || '#a8a878'}">${f}</span>`
-    ).join('');
 
-    // Busca dados da espécie (categoria e sexo)
+    document.getElementById('detFraquezas').innerHTML =
+      Array.from(fraquezas).map(etiquetaTipo).join('');
+
+    // Espécie (categoria e sexo)
     const dadosEspecie = await getDados(species.url);
     const categoriaEn = dadosEspecie.genera.find(({ language }) => language.name === 'en');
-    
-    document.getElementById('detCategoria').textContent = categoriaEn ? categoriaEn.genus.replace(' Pokémon', '') : '???';
+
+    document.getElementById('detCategoria').textContent =
+      categoriaEn ? categoriaEn.genus.replace(' Pokémon', '') : '???';
     document.getElementById('detSexo').innerHTML = determinarSexoHTML(dadosEspecie.gender_rate);
 
-    // Busca e monta a linha evolutiva completa
+    // Evoluções (com ramificações)
     const dadosEvolucao = await getDados(dadosEspecie.evolution_chain.url);
-    const cadeia = extrairEvolucoes(dadosEvolucao.chain);
-    
-    document.getElementById('detEvolucoes').innerHTML = cadeia.map(({ id: idEvo, nome }, index) => {
-      const temProximaSeta = index < cadeia.length - 1 ? '<div class="evo-seta">❯</div>' : '';
-      return `
+    const estagios = extrairEstagios(dadosEvolucao.chain);
+
+    document.getElementById('detEvolucoes').innerHTML = estagios.map((estagio, index) => {
+      const itens = estagio.map(({ id: idEvo, nome }) => `
         <div class="evo-item">
           <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${idEvo}.png" alt="${nome}">
           <p>${nome}</p>
         </div>
-        ${temProximaSeta}
-      `;
+      `).join('');
+      const seta = index < estagios.length - 1 ? '<div class="evo-seta">❯</div>' : '';
+      return `<div class="evo-estagio">${itens}</div>${seta}`;
     }).join('');
 
-  } catch (erro) { 
-    console.error("Erro ao carregar detalhes extras:", erro); 
+  } catch (erro) {
+    console.error('Erro ao carregar detalhes extras:', erro);
   }
 }
 
