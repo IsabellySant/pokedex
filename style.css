@@ -50,48 +50,66 @@ body {
 
 .cabecalho nav ul {
   display: flex;
-  gap: 30px;
+  gap: 20px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .cabecalho nav button {
-  padding: 8px 16px;
+  padding: 8px 18px;
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
   font-family: inherit;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #838282;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.cabecalho nav button:hover, .cabecalho nav button:focus-visible {
-  border-bottom-color: #cccccc;
+.cabecalho nav button:hover,
+.cabecalho nav button:focus-visible {
+  color: var(--texto-principal);
 }
 
 .cabecalho nav button.ativo {
-  color: #ffffff;
-  font-weight: bold;
-  border-bottom-color: #ffffff;
+  color: var(--vermelho-pokedex);
+  border-bottom-color: var(--vermelho-pokedex);
 }
 
 .cabecalho nav .quiz {
+position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 6px;
+  border: 2px solid var(--vermelho-pokedex);
+  border-radius: 50%;
+  background-color: var(--texto-principal);   /* fundo claro para o Mimikyu aparecer */
+  transition: transform 0.2s;
 }
 
-.quiz img {
+.cabecalho nav .quiz:hover,
+.cabecalho nav .quiz:focus-visible {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.cabecalho nav .quiz img {
   display: block;
   height: 32px;
-  width: auto;    /* mantém a proporção da imagem */
+  width: auto;
 }
 
 /* ===== Layout ===== */
 .pokedex-container {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--altura-cabecalho));
 }
 
 /* ===== Barra lateral (busca) ===== */
@@ -99,79 +117,81 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100; /* acima do cabeçalho */
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: var(--largura-barra);
   height: 100vh;
-  padding: 30px 20px;
-  background-color: var(--vermelho);
+  padding: 24px 16px;
+  background-color: var(--bg-painel);
+  border-right: 2px solid var(--borda-cor);
   overflow-y: auto;
 }
 
 .barra-lateral img {
   display: block;
-  width: 150px;
-  max-width: 100%;
+  width: 140px;
+  margin: 0 auto 10px;
 }
 
 .caixa-de-pesquisa h2 {
-  margin: 0 0 10px;
-  font-size: 1rem;
-  color: #ffffff;
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--texto-secundario);
 }
 
-.caixa-de-pesquisa input {
+.caixa-de-pesquisa input,
+.filtro select {
   width: 100%;
-  height: 30px;
+  height: 38px;
   padding: 0 12px;
-  border: 3px solid #b10909;
-  border-radius: 20px;
-  background-color: aliceblue;
-  color: black;
+  border: 1px solid var(--borda-cor);
+  border-radius: 8px;
+  background-color: var(--bg-fundo);
+  color: var(--texto-principal);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.caixa-de-pesquisa input:focus,
+.filtro select:focus {
+  border-color: var(--vermelho-pokedex);
 }
 
 /* ===== Filtros ===== */
 .filtro {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 15px;
+  gap: 6px;
+  margin-top: 12px;
 }
-
+ 
 .filtro label {
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
 }
-
-.filtro select {
-  width: 100%;
-  height: 30px;
-  padding: 0 8px;
-  border: 3px solid #b10909;
-  border-radius: 20px;
-  background-color: aliceblue;
-}
-
+ 
 .botao-limpar {
   width: 100%;
   margin-top: 20px;
-  padding: 8px 16px;
-  border: 3px solid #b10909;
-  border-radius: 20px;
-  background-color: #ffffff;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--vermelho-pokedex);
   font-family: inherit;
   font-weight: bold;
-  color: #b10909;
+  color: #ffffff;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
-
+ 
 .botao-limpar:hover,
 .botao-limpar:focus-visible {
-  background-color: #b10909;
-  color: #ffffff;
+  background-color: var(--vermelho-hover);
 }
 
 /* ===== Conteúdo principal ===== */
@@ -179,313 +199,328 @@ body {
   flex: 1;
   min-width: 0;
   margin-left: var(--largura-barra);
-  padding: 30px;
-  background-color: var(--fundo);
+  padding: 24px 32px;
 }
 
 .titulo-pagina {
   display: flex;
-  justify-content: space-between; /* título na esquerda, contador na direita */
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
-.main h1 {
+.main h3 {
   margin: 0;
-  font-size: 2rem;
-  color: var(--texto);
+  font-size: 1.6rem;
+  color: var(--texto-principal);
 }
 
 #contador {
   margin: 0;
-  color: var(--texto);
+  font-size: 0.9rem;
+  color: var(--texto-secundario)
+}
+
+#semFavoritos {
+  margin: 0 0 20px;
+  color: var(--texto-secundario);
 }
 
 /* ===== Lista e cards ===== */
 .pokemons {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
 }
 
 .cartao-pokemon {
-  padding: 20px;
-  border: 3px solid #cccccc; /* cor trocada pelo JS conforme o tipo */
+  position: relative;
+  padding: 16px;
+  border: 2px solid var(--borda-cor); /* cor trocada pelo JS conforme o tipo */
   border-radius: 12px;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   text-align: center;
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
 .cartao-pokemon:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  background-color: var(--bg-card-hover);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-.cartao-pokemon:focus-visible,
-.cartao-pokemon.ativo {
-  outline: 3px solid var(--vermelho);
+.cartao-pokemon:focus-visible {
+  outline: 2px solid var(--vermelho-pokedex);
   outline-offset: 2px;
 }
 
+.cartao-pokemon.ativo {
+  border-color: var(--vermelho-pokedex) !important;
+  box-shadow: 0 0 12px rgba(229, 62, 62, 0.4);
+}
+
 .imagem-pokemon {
-  width: 100%;
-  max-width: 130px;
-  height: auto;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin: 0 auto;
 }
 
 .nome-pokemon {
-  margin: 6px 0;
+  margin: 8px 0 4px;
   font-size: 1rem;
   text-transform: capitalize;
+  color: var(--texto-principal);
 }
 
 .numero {
   font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--texto-secundario);
 }
-
+ 
 .tipos {
   display: flex;
   justify-content: center;
-  gap: 6px;
   flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }
-
+ 
 .tipo {
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: bold;
   color: #ffffff;
   text-transform: capitalize;
 }
-
-/* ===== Barra de detalhes ===== */
+ 
+/* ===== Favoritos ===== */
+.botao-favorito {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--texto-secundario);
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+ 
+.botao-favorito:hover {
+  transform: scale(1.2);
+  color: var(--vermelho-pokedex);
+}
+ 
+.botao-favorito:focus-visible {
+  outline: 2px solid var(--vermelho-pokedex);
+  border-radius: 50%;
+}
+ 
+.botao-favorito svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+ 
+.botao-favorito.favoritado {
+  color: var(--vermelho-pokedex);
+}
+ 
+.botao-favorito.favoritado svg {
+  fill: currentColor;
+}
+ 
+/* ===== Painel Lateral de Detalhes ===== */
+/* Fica abaixo do cabeçalho fixo, senão o botão de fechar ficaria escondido ao rolar */
 .detalhes {
   width: 0;
   flex-shrink: 0;
   overflow: hidden;
   position: sticky;
-  top: 0;
-  height: 100vh;
-  background-color: #f6ffc2;
-  border-left: 0 solid var(--vermelho);
-  transition: width 0.35s ease;
+  top: var(--altura-cabecalho);
+  height: calc(100vh - var(--altura-cabecalho));
+  background-color: var(--bg-painel);
+  border-left: 0 solid var(--borda-cor);
+  transition: width 0.3s ease;
 }
-
+ 
 .detalhes.aberta {
-  width: 400px;
-  border-left-width: 4px;
+  width: 380px;
+  border-left-width: 2px;
 }
-
+ 
 .detalhes-interna {
-  width: 400px;
+  width: 380px;
   height: 100%;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   text-align: center;
-  color: var(--texto);
+  color: var(--texto-principal);
 }
-
+ 
 .detalhes-fechar {
   float: right;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
-  background-color: #eeeeee;
+  background-color: var(--bg-card);
+  color: var(--texto-principal);
   cursor: pointer;
+  font-weight: bold;
 }
-
-.detalhes-fechar:hover, .detalhes-fechar:focus-visible {
-  background-color: var(--vermelho);
-  color: #ffffff;
+ 
+.detalhes-fechar:hover,
+.detalhes-fechar:focus-visible {
+  background-color: var(--vermelho-pokedex);
 }
-
+ 
 #detImagem {
   display: block;
-  text-align: center;
-  width: 190px;
-  height: 190px;
-  margin: 30px auto 0;
-  transform: translateX(10px);
-  background-color: #ffffff;
-  border: 8px solid #a0a0a0;
-  border-radius: 3px;
+  width: 160px;
+  height: 160px;
+  margin: 20px auto 10px;
+  background-color: var(--bg-card);
+  border: 2px solid var(--borda-cor);
+  border-radius: 12px;
+  padding: 10px;
+  object-fit: contain;
 }
-
+ 
 #detNumero {
   margin: 0;
   font-size: 0.85rem;
+  color: var(--texto-secundario);
 }
-
+ 
 #detNome {
-  margin: 4px 0 10px;
+  margin: 4px 0 12px;
+  font-size: 1.5rem;
   text-transform: capitalize;
+  color: var(--texto-principal);
 }
-
-.det-medidas {
-  display: flex;
-  justify-content: space-around;
+ 
+/* Caixa de Informações */
+.det-caixa-info {
+  background-color:#094f6c;
+  border: 1px solid var(--borda-cor);
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   margin: 16px 0;
+  text-align: left;
+}
+ 
+.info-item span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
 }
 
-.det-medidas span {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.85rem;
-}
-
-.det-medidas b {
-  font-size: 1.1rem;
-}
-
-#detSexo span {
-  font-size: 1.4rem;
+#detSexo .simbolo-sexo {
+  display: inline;       /* anula o display:block do .info-item span */
+  font-size: 1.6rem;
   font-weight: bold;
+  line-height: 1;
   vertical-align: middle;
 }
 
-.detalhes h3 {
-  margin: 0 0 8px;
-  text-align: left;
-}
-
-.stat {
-  margin: 8px 0;
-  text-align: left;
-  font-size: 0.85rem;
-}
-
-.stat-topo {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 3px;
-}
-
-.stat-barra {
-  height: 8px;
-  border-radius: 99px;
-  background-color: #e6e6e6;
-  overflow: hidden;
-}
-
-.stat-barra span {
-  display: block;
-  height: 100%;
-  background-color: var(--vermelho);
-}
-
-/* ===== Favoritos ===== */
-.cartao-pokemon {
-  position: relative;
-}
-
-.botao-favorito {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  background: none;
-  color: #b10909;
-  cursor: pointer;
-}
-
-.botao-favorito svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-}
-
-.botao-favorito.favoritado svg {
-  fill: currentColor;
-}
-
-.botao-favorito:focus-visible {
-  outline: 2px solid var(--vermelho);
-  border-radius: 50%;
-}
-
-#semFavoritos {
-  margin: 0 0 20px;
-  color: var(--texto);
-}
-
-/* ===== Sessões de detalhes ===== */
-.det-sessao {
-  margin: 15px 0;
-  text-align: left;
-}
-
-.det-sessao h3 {
-  font-size: 1rem;
-  margin-bottom: 8px;
-  border-bottom: 2px solid #eeeeee;
-  padding-bottom: 4px;
-}
-
-/* Caixa azul de informações */
-.det-caixa-info {
-  background-color: #30a7d7;
-  border-radius: 10px;
-  padding: 15px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin: 20px 0;
-  color: white;
-  text-align: left;
-}
-
-.info-item span {
-  display: block;
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
+.simbolo-sexo.macho { color: #63b3ed; }
+.simbolo-sexo.femea { color: #f687b3; }
+ 
 .info-item b {
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 0.95rem;
+  color: var(--texto-principal);
   text-transform: capitalize;
 }
-
+ 
 .info-item i {
   font-size: 0.75rem;
   font-weight: normal;
+  color: var(--texto-secundario);
 }
-
+ 
+.det-sessao {
+  margin: 18px 0;
+  text-align: left;
+}
+ 
+.det-sessao h3 {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--borda-cor);
+  padding-bottom: 6px;
+  color: var(--texto-principal);
+}
+ 
+.detalhes h3 {
+  text-align: left;
+}
+ 
 /* Shiny */
 .det-shiny {
   text-align: center;
 }
-
+ 
 #detShiny {
   width: 80px;
   height: 80px;
-  background-color: #f8f8f8;
-  border-radius: 50%;
   margin: 0 auto;
+  background-color: var(--bg-card);
+  border: 2px solid var(--borda-cor);
+  border-radius: 50%;
 }
-
-/* Caixa escura de evoluções */
+ 
+/* Status Base */
+.stat {
+  margin: 8px 0;
+  text-align: left;
+  font-size: 0.8rem;
+}
+ 
+.stat-topo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  color: var(--texto-secundario);
+}
+ 
+.stat-topo b {
+  color: var(--texto-principal);
+}
+ 
+.stat-barra {
+  height: 6px;
+  border-radius: 99px;
+  background-color: var(--bg-card);
+  overflow: hidden;
+}
+ 
+.stat-barra span {
+  display: block;
+  height: 100%;
+  background-color: var(--vermelho-pokedex);
+  border-radius: 99px;
+}
+ 
+/* Evoluções */
 .caixa-evolucoes {
-  background-color: #424242;
-  border-radius: 10px;
-  padding: 15px;
-  margin-top: 20px;
-  color: white;
+  background-color: var(--bg-card);
+  border: 1px solid var(--borda-cor);
+  border-radius: 12px;
+  padding: 16px;
 }
-
-.caixa-evolucoes h3 {
-  color: white;
-  border-bottom-color: #555;
-}
-
+ 
 .evolucoes-lista {
   display: flex;
   align-items: center;
@@ -493,8 +528,8 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
-
-/* Um estágio = um ou mais Pokémon no mesmo nível da evolução (ex.: as evoluções do Eevee) */
+ 
+/* Um estágio = um ou mais Pokémon no mesmo nível (ex.: as evoluções do Eevee) */
 .evo-estagio {
   display: flex;
   align-items: center;
@@ -502,96 +537,96 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
-
+ 
 .evo-item {
   text-align: center;
 }
-
+ 
 .evo-item img {
   width: 70px;
   height: 70px;
-  background-color: #616161;
-  border: 3px solid white;
+  background-color: var(--bg-fundo);
+  border: 2px solid var(--borda-cor);
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
-
+ 
 .evo-item p {
   margin: 5px 0 0;
   font-size: 0.8rem;
   text-transform: capitalize;
+  color: var(--texto-secundario);
 }
-
+ 
 .evo-seta {
-  font-size: 1.5rem;
-  color: white;
+  font-size: 1.4rem;
   font-weight: bold;
+  color: var(--vermelho-pokedex);
 }
-
-/* Área de anotações */
-.caixa-anotacoes {
-  position: relative;
-}
-
+ 
+/* Caixa de Anotações */
 #detNota {
   width: 100%;
   min-height: 80px;
   padding: 10px;
-  border: 2px solid #cccccc;
+  border: 1px solid var(--borda-cor);
   border-radius: 8px;
+  background-color: var(--bg-fundo);
+  color: var(--texto-principal);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   resize: vertical;
-  background-color: #fafafa;
-  color: var(--texto);
 }
-
+ 
 #detNota:focus {
   outline: none;
-  border-color: var(--vermelho);
-  background-color: #ffffff;
+  border-color: var(--vermelho-pokedex);
 }
-
+ 
 /* ===== Ataques e Itens ===== */
-.cartao-item, .cartao-ataque {
-  padding: 20px;
-  border: 3px solid #cccccc;
-  border-radius: 12px;
-  background-color: #ffffff;
-  text-align: center;
+.cartao-item,
+.cartao-ataque {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 16px;
+  border: 1px solid var(--borda-cor);
+  border-radius: 12px;
+  background-color: var(--bg-card);
+  text-align: center;
 }
-
+ 
 .cartao-item img {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 10px;
+  width: 50px;
+  height: 50px;
 }
-
-.cartao-item h3, .cartao-ataque h3 {
-  margin: 0 0 10px;
-  font-size: 1.1rem;
+ 
+.cartao-item h3,
+.cartao-ataque h3 {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: var(--texto-principal);
   text-transform: capitalize;
-  color: var(--texto);
 }
-
+ 
 .cartao-item p {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--texto-secundario);
   margin: 0;
 }
-
+ 
 .cartao-ataque .stats-ataque {
   display: flex;
   gap: 15px;
   margin-top: 10px;
   font-size: 0.85rem;
-  color: var(--texto);
+  color: var(--texto-secundario);
 }
-
+ 
 .cartao-ataque .stats-ataque p {
   margin: 0;
+}
+ 
+.cartao-ataque .stats-ataque b {
+  color: var(--texto-principal);
 }

@@ -35,10 +35,13 @@ function gerarBarrasStatus(stats) {
 
 // Retorna a marcação de gênero com base no gender_rate da PokéAPI
 function determinarSexoHTML(genderRate) {
+  const macho = '<span class="simbolo-sexo macho">♂</span>';
+  const femea = '<span class="simbolo-sexo femea">♀</span>';
+
   if (genderRate === -1) return 'Sem gênero';
-  if (genderRate === 8) return '<span style="color: #8d0202;">♀</span> (Fêmea)';
-  if (genderRate === 0) return '<span style="color: blue;">♂</span> (Macho)';
-  return '<span style="color: blue;">♂</span> <span style="color: #8d0202;">♀</span>';
+  if (genderRate === 8) return `${femea} (Fêmea)`;
+  if (genderRate === 0) return `${macho} (Macho)`;
+  return `${macho} ${femea}`;
 }
 
 // Monta a linha evolutiva em estágios, já considerando ramificações.
